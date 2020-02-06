@@ -1,0 +1,9 @@
+#!/bin/bash
+# Based on https://aur.archlinux.org/packages/playerctl/
+
+until player_pids=$(pidof ${BLOCK_INSTANCE})
+do
+    sleep 10
+done
+
+playerctl-song "${BLOCK_INSTANCE}"
