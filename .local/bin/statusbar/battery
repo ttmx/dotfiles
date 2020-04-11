@@ -11,8 +11,11 @@ case $BLOCK_BUTTON in
 - Text color reflects charge left" ;;
 esac
 
-capacity=$(cat /sys/class/power_supply/"$1"/capacity) || exit
-status=$(cat /sys/class/power_supply/"$1"/status)
+for battery in /sys/class/power_supply/BAT?
+do
+capacity=$(cat "$battery"/capacity) || exit
+status=$(cat "$battery"/status)
+
 if [ "$capacity" -ge 75 ]; then
 	color="#7ca075"
 	batsymb=""
@@ -31,3 +34,4 @@ fi
 [ "$status" = "Charging" ] && color="#7ca075"
 
 printf "<span color='%s'>%s%s</span>\n" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not Charging/🛑/;s/Charging//;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
+done

@@ -29,6 +29,7 @@ alias ka="killall" \
 	xclip="xclip -selection \"clipboard\"" \
 	please='sudo $(fc -ln -1)' \
 	config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME' \
+	alias rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
 
 command -v nvim >/dev/null && alias vim="nvim" vimdiff="nvim -d" # Use neovim for vim if present.
 

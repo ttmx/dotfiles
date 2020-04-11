@@ -4,4 +4,4 @@
 # For example:
 # `./prompt "Do you want to shutdown?" "shutdown -h now"`
 
-[ "$(printf "No\\nYes" | dmenu -i -p "$1" -fn "Ubuntu-mono-10" -nb "#5e81ac" -sb "#8fbcbb" -nf "#d8dee9" -nf "#d8dee9" )" = "Yes" ] && $2
+[ "$(printf "No\\nYes" | dmenu -i -p "$1" -nb "#5e81ac" -sb "#8fbcbb" -nf "#d8dee9" -nf "#d8dee9" )" = "Yes" ] && $2

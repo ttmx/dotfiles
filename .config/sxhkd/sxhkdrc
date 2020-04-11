@@ -2,7 +2,7 @@
 super + Return
 	$TERMINAL
 super + d
-	dmenu_run -fn "Ubuntu-mono-10" -nb "#1b1e2b" -nf "#e5e9f0" -sb "#5e81ac" -sf "#e5e9f0"
+	dmenu_run
 super + r
 	$TERMINAL -e $FILE
 super + e
@@ -39,24 +39,26 @@ super + shift + x
 	prompt "Shutdown computer?" "sudo -A shutdown -h now"
 super + shift + BackSpace
 	prompt "Reboot computer?" "sudo -A shutdown -r now"
+super + shift + Escape
+	prompt 'Leave Xorg?' 'sudo killall Xorg'
 super + x
 	mpc pause; pauseallmpv; i3lock -e -f -c 1b1e2b; xset dpms force off
 XF86Launch1
 	xset dpms force off
 XF86AudioMute
-	lmc mute
+	pulsemixer --toggle-mute
 XF86AudioLowerVolume
-	lmc down 5
+	pulsemixer --change-volume -5
 shift+XF86AudioLowerVolume
-	lmc down 10
+	pulsemixer --change-volume -15
 control+XF86AudioLowerVolume
-	lmc down 1
+	pulsemixer --change-volume -1
 XF86AudioRaiseVolume
-	lmc up 5
+	pulsemixer --change-volume +5
 shift+XF86AudioRaiseVolume
-	lmc up 10
+	pulsemixer --change-volume +15
 control+XF86AudioRaiseVolume
-	lmc up 1
+	pulsemixer --change-volume +1
 XF86AudioNext
 	lmc next
 XF86AudioPlay
@@ -74,7 +76,7 @@ XF86MonBrightnessUp
 # Recording
 # Take screenshot
 Print
-	maim Images/Screenshots/pic-full-$(date '+%y%m%d-%H%M-%S').png
+	maim $SCREENSHOTS/pic-full-$(date '+%y%m%d-%H%M-%S').png
 # Pick screenshot type
 shift + Print
 	maimpick
@@ -86,10 +88,10 @@ super + Delete
 	dmenurecord kill
 
 # Next song
-super + equal
+super + guillemotleft
 	playerctl next
 # Previous song
-super + minus
+super + apostrophe
 	playerctl previous
 # Play/pause song
 super + plus
