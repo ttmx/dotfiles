@@ -92,7 +92,7 @@
     background = "#bf616a"
     foreground = "#eceff4"
     frame_color = "#bf616a"
-    timeout = 0
+    timeout = 5
 
 # Every section that isn't one of the above is interpreted as a rules to
 # override settings for certain messages.

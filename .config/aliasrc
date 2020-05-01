@@ -25,11 +25,10 @@ alias ka="killall" \
 	upc="sudo pacman -Syu; pkill -RTMIN+8 i3blocks" \
 	lsp="pacman -Qett --color=always | less" \
 	ffmpeg="ffmpeg -hide_banner" \
-	ramme="/opt/Ramme/ramme" \
 	xclip="xclip -selection \"clipboard\"" \
 	please='sudo $(fc -ln -1)' \
-	config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME' \
-	alias rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
+	config='/usr/bin/git --git-dir=$HOME/Documents/dotfiles --work-tree=$HOME' \
+	rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"
 
 command -v nvim >/dev/null && alias vim="nvim" vimdiff="nvim -d" # Use neovim for vim if present.
 

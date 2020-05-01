@@ -46,19 +46,9 @@ super + x
 XF86Launch1
 	xset dpms force off
 XF86AudioMute
-	pulsemixer --toggle-mute
-XF86AudioLowerVolume
-	pulsemixer --change-volume -5
-shift+XF86AudioLowerVolume
-	pulsemixer --change-volume -15
-control+XF86AudioLowerVolume
-	pulsemixer --change-volume -1
-XF86AudioRaiseVolume
-	pulsemixer --change-volume +5
-shift+XF86AudioRaiseVolume
-	pulsemixer --change-volume +15
-control+XF86AudioRaiseVolume
-	pulsemixer --change-volume +1
+	amixer sset Master toggle; pkill -RTMIN+10 blocks
+XF86Audio{Raise,Lower}Volume
+	amixer sset Master 5%{+,-}; pkill -RTMIN+10 blocks
 XF86AudioNext
 	lmc next
 XF86AudioPlay
@@ -68,10 +58,9 @@ XF86AudioPrev
 XF86AudioStop
 	lmc toggle
 XF86MonBrightnessDown
-	xbacklight -dec 2
+	xbacklight -dec 10 & $(dprog $(($(xbacklight -get |cut -f1 -d".") - 10)) || dprog 0)
 XF86MonBrightnessUp
-	xbacklight -inc 2
-
+	xbacklight -inc 10 & $(dprog $(($(xbacklight -get |cut -f1 -d".") + 10)) || dprog 100)
 
 # Recording
 # Take screenshot

@@ -69,13 +69,17 @@ var PluginRepo = (_ => {
 	return class PluginRepo {
 		getName () {return "PluginRepo";} 
 
-		getVersion () {return "1.9.6";}
+		getVersion () {return "1.9.7";}
 
 		getAuthor () {return "DevilBro";}
 
 		getDescription () {return "Allows you to look at all plugins from the plugin repo and download them on the fly. Repo button is in the plugins settings.";}
 
-		constructor () {			
+		constructor () {
+			this.changelog = {
+				"improved":[["Loading","Switched from using and iFrame to using an extra Browser Window to load the plugin list, should be faster too"]]
+			};	
+			
 			this.patchedModules = {
 				after: {
 					V2C_ContentColumn: "render"
@@ -210,7 +214,7 @@ var PluginRepo = (_ => {
 			return settingsPanel = BDFDB.PluginUtils.createSettingsPanel(this, settingsItems);
 		}
 
-		//legacy
+		// Legacy
 		load () {}
 
 		start () {
@@ -238,13 +242,6 @@ var PluginRepo = (_ => {
 			if (window.BDFDB && typeof BDFDB === "object" && BDFDB.loaded) {
 				if (this.started) return;
 				BDFDB.PluginUtils.init(this);
-				
-				// REMOVE 10.02.2020
-				let olddata = BDFDB.DataUtils.load(this, "ownlist", "ownlist");
-				if (olddata) {
-					BDFDB.DataUtils.save(olddata, this, "custom");
-					BDFDB.DataUtils.remove(this, "ownlist");
-				}
 
 				this.loadPlugins();
 
@@ -267,18 +264,12 @@ var PluginRepo = (_ => {
 
 				BDFDB.DOMUtils.remove(".bd-pluginrepobutton", ".pluginrepo-notice", ".pluginrepo-loadingicon");
 
-				let frame = document.querySelector("iframe.discordSandbox");
-				if (frame) {
-					window.removeEventListener("message", frame.messageReceived);
-					BDFDB.DOMUtils.remove(frame);
-				}
-
 				BDFDB.PluginUtils.clear(this);
 			}
 		}
 
 
-		// begin of own functions
+		// Begin of own functions
 
 		onUserSettingsCogContextMenu (e) {
 			BDFDB.TimeUtils.timeout(_ => {
@@ -308,8 +299,8 @@ var PluginRepo = (_ => {
 		}
 		
 		getCustomList () {
-			let customlist = BDFDB.DataUtils.load(this, "custom");
-			return BDFDB.ArrayUtils.is(customlist) ? customlist : [];
+			let customList = BDFDB.DataUtils.load(this, "custom");
+			return BDFDB.ArrayUtils.is(customList) ? customList : [];
 		}
 
 		openPluginRepoModal (options = {}) {
@@ -485,7 +476,7 @@ var PluginRepo = (_ => {
 							text: BDFDB.LanguageUtils.LanguageStrings.NEW
 						}),
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.FavButton, {
-							className: BDFDB.disCNS._repoentryiconwrapper + BDFDB.disCN.cursorpointer,
+							className: BDFDB.disCN._repocontrolsbutton,
 							isFavorite: plugin.fav == favStates.FAVORIZED,
 							onClick: value => {
 								plugin.fav = value ? favStates.FAVORIZED : favStates.NOT_FAVORIZED;
@@ -501,16 +492,16 @@ var PluginRepo = (_ => {
 									name: BDFDB.LibraryComponents.SvgIcon.Names.GITHUB,
 									className: BDFDB.disCN._repoicon,
 									onClick: _ => {
-										let giturl = null;
+										let gitUrl = null;
 										if (plugin.url.indexOf("https://raw.githubusercontent.com") == 0) {
 											let temp = plugin.url.replace("//raw.githubusercontent", "//github").split("/");
 											temp.splice(5, 0, "blob");
-											giturl = temp.join("/");
+											gitUrl = temp.join("/");
 										}
 										else if (plugin.url.indexOf("https://gist.githubusercontent.com/") == 0) {
-											giturl = plugin.url.replace("//gist.githubusercontent", "//gist.github").split("/raw/")[0];
+											gitUrl = plugin.url.replace("//gist.githubusercontent", "//gist.github").split("/raw/")[0];
 										}
-										if (giturl) BDFDB.DiscordUtils.openLink(giturl, BDFDB.DataUtils.get(this, "settings", "useChromium"));
+										if (gitUrl) BDFDB.DiscordUtils.openLink(gitUrl, BDFDB.DataUtils.get(this, "settings", "useChromium"));
 									}
 								})
 							})
@@ -553,10 +544,10 @@ var PluginRepo = (_ => {
 		}
 
 		loadPlugins () {
-			BDFDB.DOMUtils.remove("iframe.discordSandbox", ".pluginrepo-loadingicon");
+			BDFDB.DOMUtils.remove(".pluginrepo-loadingicon");
 			let settings = BDFDB.DataUtils.load(this, "settings");
-			let getPluginInfo, extractConfigInfo, createFrame, runInFrame;
-			let frame, framerunning = false, framequeue = [], outdated = 0, newentries = 0, i = 0;
+			let getPluginInfo, extractConfigInfo, createSandbox, runInSandbox;
+			let sandbox, sandboxRunning = false, sandboxQueue = [], outdated = 0, newentries = 0, i = 0;
 			let tags = ["getName", "getVersion", "getAuthor", "getDescription"];
 			let seps = ["\"", "\'", "\`"];
 			let newentriesdata = BDFDB.DataUtils.load(this, "newentriesdata"), customList = this.getCustomList();
@@ -578,32 +569,31 @@ var PluginRepo = (_ => {
 						}
 					},1200000), amount:loading.amount+1};
 					
-					let loadingicon = BDFDB.DOMUtils.create(pluginRepoIcon);
-					BDFDB.DOMUtils.addClass(loadingicon, "pluginrepo-loadingicon");
-					loadingicon.addEventListener("mouseenter", _ => {
-						BDFDB.TooltipUtils.create(loadingicon, this.getLoadingTooltipText(), {
+					let loadingIcon = BDFDB.DOMUtils.create(pluginRepoIcon);
+					BDFDB.DOMUtils.addClass(loadingIcon, "pluginrepo-loadingicon");
+					loadingIcon.addEventListener("mouseenter", _ => {
+						BDFDB.TooltipUtils.create(loadingIcon, this.getLoadingTooltipText(), {
 							type: "left",
 							delay: 500,
 							style: "max-width: unset;",
 							selector: "pluginrepo-loading-tooltip"
 						});
 					});
-					BDFDB.PluginUtils.addLoadingIcon(loadingicon);
+					BDFDB.PluginUtils.addLoadingIcon(loadingIcon);
 
-					createFrame().then(_ => {
+					createSandbox().then(_ => {
 						getPluginInfo(_ => {
 							if (!this.started) {
 								BDFDB.TimeUtils.clear(loading.timeout);
-								BDFDB.DOMUtils.remove(frame);
-								if (frame && frame.messageReceived) window.removeEventListener("message", frame.messageReceived);
+								BDFDB.WindowUtils.close(sandbox);
 								return;
 							}
 							let finishCounter = 0, finishInterval = BDFDB.TimeUtils.interval(_ => { 
-								if ((framequeue.length == 0 && !framerunning) || finishCounter > 300 || !loading.is) {
+								if ((sandboxQueue.length == 0 && !sandboxRunning) || finishCounter > 300 || !loading.is) {
 									BDFDB.TimeUtils.clear(loading.timeout);
 									BDFDB.TimeUtils.clear(finishInterval);
-									BDFDB.DOMUtils.remove(frame, loadingicon, ".pluginrepo-loadingicon");
-									if (frame && frame.messageReceived) window.removeEventListener("message", frame.messageReceived);
+									BDFDB.WindowUtils.close(sandbox);
+									BDFDB.DOMUtils.remove(loadingIcon, ".pluginrepo-loadingicon");
 									loading = {is:false, timeout:null, amount:loading.amount};
 									
 									BDFDB.LogUtils.log("Finished fetching Plugins.", this.name);
@@ -665,7 +655,7 @@ var PluginRepo = (_ => {
 				}
 			});
 
-			getPluginInfo = (callback) => {
+			getPluginInfo = callback => {
 				if (i >= foundPlugins.length || !this.started || !loading.is) {
 					callback();
 					return;
@@ -682,16 +672,16 @@ var PluginRepo = (_ => {
 							/* code is minified -> add newlines */
 							bodyCopy = body.replace(/}/g, "}\n");
 						}
-						let bodyWithoutSpecial = bodyCopy.replace(/\n|\r|\t/g, "");
-						let configreg = /(\.exports|config)\s*=\s*\{["'`]*info["'`]*\s*:\s*/i.exec(bodyWithoutSpecial);
-						if (url != "https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/PluginRepo/PluginRepo.plugin.js" && configreg) {
+						let bodyWithoutSpecial = bodyCopy.replace(/\n|\r|\t/g, "").replace(/\n|\r|\t/g, "");
+						let configReg = /(\.exports|config)\s*=\s*\{\s*["'`]*info["'`]*\s*:\s*/i.exec(bodyWithoutSpecial);
+						if (url != "https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/PluginRepo/PluginRepo.plugin.js" && configReg) {
 							try {
-								extractConfigInfo(plugin, JSON.parse('{"info":' + bodyWithoutSpecial.substring(configreg.index).split(configreg[0])[1].split("};")[0].split("}},")[0] + '}'));
+								extractConfigInfo(plugin, JSON.parse('{"info":' + bodyWithoutSpecial.substring(configReg.index).split(configReg[0])[1].split("};")[0].split("}},")[0] + '}'));
 							}
 							catch (err) {
 								try {
 									let i = 0, j = 0, configString = "";
-									for (let c of (bodyWithoutSpecial.substring(configreg.index).split(configreg[0])[1].split("};")[0].split("}},")[0]).replace(/,/g, ',"').replace(/:/g, '":').replace(/{/g, '{"').replace(/""/g, '"').replace(/" /g, ' ').replace(/,"{/g, ',{').replace(/,"\[/g, ',[').replace(/":\/\//g, ':\/\/')) {
+									for (let c of (bodyWithoutSpecial.substring(configReg.index).split(configReg[0])[1].split("};")[0].split("}},")[0]).replace(/,/g, ',"').replace(/:/g, '":').replace(/{/g, '{"').replace(/""/g, '"').replace(/" /g, ' ').replace(/,"{/g, ',{').replace(/,"\[/g, ',[').replace(/":\/\//g, ':\/\/')) {
 										configString += c;
 										if (c == "{") i++;
 										else if (c == "}") j++;
@@ -699,9 +689,7 @@ var PluginRepo = (_ => {
 									}
 									extractConfigInfo(plugin, JSON.parse('{"info":' + configString + '}'));
 								}
-								catch (err2) {
-									console.log(err2);
-								}
+								catch (err2) {}
 							}
 						}
 						else {
@@ -726,9 +714,9 @@ var PluginRepo = (_ => {
 							if (this.isPluginOutdated(plugin, url)) outdated++;
 							if (!cachedPlugins.includes(url)) newentries++;
 						}
-						else if (frame && frame.contentWindow) {
-							framequeue.push({body, url});
-							runInFrame();
+						else if (sandbox) {
+							sandboxQueue.push({body, url});
+							runInSandbox();
 						}
 					}
 					i++;
@@ -755,82 +743,66 @@ var PluginRepo = (_ => {
 				}
 			};
 
-			createFrame = _ => {
+			createSandbox = _ => {
 				return new Promise(callback => {
-					frame = BDFDB.DOMUtils.create(`<iframe class="discordSandbox" style="position: absolute !important; opacity: 0 !important; pointer-events: none !important;" src="https://mwittrien.github.io/BetterDiscordAddons/Plugins/ThemeRepo/res/DiscordPreview.html"></iframe>`);
-					frame.startTimeout = BDFDB.TimeUtils.timeout(_ => {
+					let loadTimeout = BDFDB.TimeUtils.timeout(_ => {
 						callback();
-					},600000);
-					frame.messageReceived = e => {
-						if (!document.contains(frame)) {
-							window.removeEventListener("message", frame.messageReceived);
+					}, 600000);
+					sandbox = BDFDB.WindowUtils.open(this, "https://mwittrien.github.io/BetterDiscordAddons/Plugins/ThemeRepo/res/DiscordPreview.html", {
+						onLoad: _ => {
+							BDFDB.TimeUtils.clear(loadTimeout);
+							sandbox.executeJavaScriptSafe(`window.onmessage({
+								origin: "PluginRepo",
+								reason: "OnLoad",
+								classes: ${JSON.stringify(JSON.stringify(BDFDB.DiscordClasses))},
+								classModules: ${JSON.stringify(JSON.stringify(BDFDB.DiscordClassModules))}
+							})`);
+							callback();
 						}
-						else if (typeof e.data === "object" && e.data.origin == "DiscordPreview") {
-							switch (e.data.reason) {
-								case "OnLoad":
-									frame.contentWindow.postMessage({
-										origin: "PluginRepo",
-										reason: "OnLoad",
-										classes: JSON.stringify(BDFDB.DiscordClasses),
-										classmodules: JSON.stringify(BDFDB.DiscordClassModules)
-									}, "*");
-									callback();
-									break;
-							}
-						}
-					};
-					window.addEventListener("message", frame.messageReceived);
-
-					document.body.appendChild(frame);
+					});
 				});
 			}
 
-			runInFrame = _ => {
-				if (framerunning) return;
-				let framedata = framequeue.shift();
-				if (!framedata) return;
-				framerunning = true;
-				let {body, url} = framedata;
-				let name = body.replace(/\s*:\s*/g, ":").split('"name":"');
-				if (name.length > 1) {
-					name = name[1].split('"')[0];
-					let processResult = plugin => {
-						if (BDFDB.ObjectUtils.is(plugin)) {
-							plugin.url = url;
-							loadedPlugins[url] = plugin;
-							if (this.isPluginOutdated(plugin, url)) outdated++;
+			runInSandbox = _ => {
+				if (sandboxRunning) return;
+				let sandboxData = sandboxQueue.shift();
+				if (!sandboxData) return;
+				let {body, url} = sandboxData;
+				let name = (body.replace(/\s*:\s*/g, ":").split('"name":"')[1] || "").split('"')[0];
+				name = name ? name : (body.replace(/ {2,}/g, " ").replace(/\r/g, "").split("@name ")[1] || "").split("\n")[0];
+				if (name) {
+					let messageId = (this.name + name + BDFDB.NumberUtils.generateId()).replace(/\s/g, "").trim();
+					sandboxRunning = true;
+					BDFDB.WindowUtils.addListener(this, messageId, (event, messageData) => {
+						BDFDB.WindowUtils.removeListener(this, messageId);
+						if (BDFDB.ObjectUtils.is(messageData.plugin)) {
+							messageData.plugin.url = url;
+							loadedPlugins[url] = messageData.plugin;
+							if (this.isPluginOutdated(messageData.plugin, url)) outdated++;
 							if (!cachedPlugins.includes(url)) newentries++;
 						}
-						framerunning = false;
-						runInFrame();
-					};
-					let evalResultReceived = e => {
-						if (typeof e.data === "object" && e.data.origin == "DiscordPreview") {
-							switch (e.data.reason) {
-								case "EvalResult":
-									window.removeEventListener("message", evalResultReceived);
-									processResult(e.data.result);
-									break;
-							}
-						}
-					};
-					window.addEventListener("message", evalResultReceived);
-					if (frame.contentWindow) frame.contentWindow.postMessage({origin:"PluginRepo",reason:"Eval",jsstring:`
+						sandboxRunning = false;
+						runInSandbox();
+					});
+					sandbox.executeJavaScriptSafe(`
+						let result = null;
 						try {
-							${body}
-							var p = new ${name}();
-							var data = {
-								"getName":getString(p.getName()),
-								"getAuthor":getString(p.getAuthor()),
-								"getVersion":getString(p.getVersion()),
-								"getDescription":getString(p.getDescription())
+							${body};
+							let p = new ${name}();
+							result = {
+								"getName": getString(p.getName()),
+								"getAuthor": getString(p.getAuthor()),
+								"getVersion": getString(p.getVersion()),
+								"getDescription": getString(p.getDescription())
 							};
-							window.evalResult = data;
 						}
-						catch (err) {
-							window.evalResult = null;
-						}`
-					},"*");
+						catch (err) {}
+						window.respondToParent({
+							hostId: ${BDFDB.LibraryRequires.electron.remote.getCurrentWindow().webContents.id},
+							hostName: "${messageId}",
+							plugin: result
+						});
+					`);
 				}
 			}
 		}

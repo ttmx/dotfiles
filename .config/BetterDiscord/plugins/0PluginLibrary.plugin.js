@@ -116,10 +116,10 @@ var ZeresPluginLibrary =
 /*!*************************!*\
   !*** ./src/config.json ***!
   \*************************/
-/*! exports provided: info, changelog, main, default */
+/*! exports provided: info, main, default */
 /***/ (function(module) {
 
-module.exports = {"info":{"name":"ZeresPluginLibrary","authors":[{"name":"Zerebos","discord_id":"249746236008169473","github_username":"rauenzi","twitter_username":"ZackRauen"}],"version":"1.2.14","description":"Gives other plugins utility functions and the ability to emulate v2.","github":"https://github.com/rauenzi/BDPluginLibrary","github_raw":"https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js"},"changelog":[{"title":"Improvements","type":"improved","items":["**Internal changes** to stop using all BD globals outside of `BdApi`.","**jQuery** now no longer used in the library--not that there was much anyways.","Added some new options to the Slider setting to make it customizable","There were also some various performance improvements."]},{"title":"Bugs Squashed","type":"fixed","items":["`ReactComponents` had some bugs with how it stored and searched components, this has been fixed.","There was a bug where the library reloaded the wrong plugins, it shouldn't do that anymore."]}],"main":"plugin.js"};
+module.exports = {"info":{"name":"ZeresPluginLibrary","authors":[{"name":"Zerebos","discord_id":"249746236008169473","github_username":"rauenzi","twitter_username":"ZackRauen"}],"version":"1.2.16","description":"Gives other plugins utility functions and the ability to emulate v2.","github":"https://github.com/rauenzi/BDPluginLibrary","github_raw":"https://raw.githubusercontent.com/rauenzi/BDPluginLibrary/master/release/0PluginLibrary.plugin.js"},"main":"plugin.js"};
 
 /***/ }),
 
@@ -556,7 +556,7 @@ __webpack_require__.r(__webpack_exports__);
     get GuildMemberStore() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("getMember");},
     get MemberCountStore() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("getMemberCounts");},
     get GuildEmojiStore() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("getEmojis");},
-    // get GuildActions() {return WebpackModules.getByProps("requestMembers");},
+    get GuildActions() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("requestMembers");}, // apparently it's back
     get GuildPermissions() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("getGuildPermissions");},
 
     /* Channel Store & Actions */
@@ -699,7 +699,7 @@ __webpack_require__.r(__webpack_exports__);
     /* Modals */
     get ModalStack() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("push", "update", "pop", "popWithKey");},
     get UserProfileModals() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("fetchMutualFriends", "setSection");},
-    get AlertModal() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByPrototypes("handleCancel", "handleSubmit", "handleMinorConfirm");},
+    get AlertModal() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByPrototypes("handleCancel", "handleSubmit");},
     get ConfirmationModal() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getModule(m => m.defaultProps && m.key && m.key() == "confirm-modal");},
     // Grab with react components or open with UserProfileModals
     // get UserProfileModal() {
@@ -744,7 +744,7 @@ __webpack_require__.r(__webpack_exports__);
 
     /* Misc */
     get ExternalLink() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByRegex(/trusted/);},
-    get TextElement() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("Sizes", "Weights");},
+    get TextElement() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByDisplayName("Text");},
     get FlexChild() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("Child");},
     get Titles() {return _webpackmodules__WEBPACK_IMPORTED_MODULE_1__["default"].getByProps("Tags", "default");},
 
@@ -2067,14 +2067,12 @@ class PluginUpdater {
             window.PluginUpdates = {
                 plugins: {},
                 checkAll: async function() {
-                    ui__WEBPACK_IMPORTED_MODULE_4__["Toasts"].info("Plugin update check in progress.");
                     for (const key in this.plugins) {
                         const plugin = this.plugins[key];
                         if (!plugin.versioner) plugin.versioner = PluginUpdater.defaultVersioner;
                         if (!plugin.comparator) plugin.comparator = PluginUpdater.defaultComparator;
                         await PluginUpdater.processUpdateCheck(plugin.name, plugin.raw);
                     }
-                    ui__WEBPACK_IMPORTED_MODULE_4__["Toasts"].success("Plugin update check complete.");
                 },
                 interval: setInterval(() => {
                     window.PluginUpdates.checkAll();
@@ -2098,7 +2096,7 @@ class PluginUpdater {
         return new Promise(resolve => {
             const request = __webpack_require__(/*! request */ "request");
             request(updateLink, (error, response, result) => {
-                if (error) return;
+                if (error || response.statusCode !== 200) return resolve();
                 const remoteVersion = window.PluginUpdates.plugins[updateLink].versioner(result);
                 const hasUpdate = window.PluginUpdates.plugins[updateLink].comparator(window.PluginUpdates.plugins[updateLink].version, remoteVersion);
                 if (hasUpdate) resolve(this.showUpdateNotice(pluginName, updateLink));
@@ -2154,7 +2152,8 @@ class PluginUpdater {
     static createUpdateButton() {
         const updateButton = _domtools__WEBPACK_IMPORTED_MODULE_1__["default"].parseHTML(`<button class="bd-pfbtn bd-updatebtn" style="left: 220px;">Check for Updates</button>`);
         updateButton.onclick = function () {
-            window.PluginUpdates.checkAll();
+            ui__WEBPACK_IMPORTED_MODULE_4__["Toasts"].info("Plugin update check in progress.");
+            window.PluginUpdates.checkAll().then(() => {ui__WEBPACK_IMPORTED_MODULE_4__["Toasts"].success("Plugin update check complete.");});
         };
         const tooltip = new ui__WEBPACK_IMPORTED_MODULE_4__["EmulatedTooltip"](updateButton, "Checks for updates of plugins that support this feature. Right-click for a list.");
         updateButton.oncontextmenu = function () {
@@ -8214,12 +8213,7 @@ class Modals {
      * @param {string} body - text to show inside the modal
      */
     static showAlertModal(title, body) {
-        modules__WEBPACK_IMPORTED_MODULE_0__["DiscordModules"].ModalStack.push(function(props) {
-            return ce(modules__WEBPACK_IMPORTED_MODULE_0__["DiscordModules"].AlertModal, Object.assign({
-                title: title,
-                body: body,
-            }, props));
-        });
+        this.showConfirmationModal(title, body, {cancelText: null});
     }
 
     /**
@@ -8279,7 +8273,7 @@ class Modals {
         const renderHeader = function() {
             return ce(modules__WEBPACK_IMPORTED_MODULE_0__["DiscordModules"].FlexChild.Child, {grow: 1, shrink: 1},
                 ce(modules__WEBPACK_IMPORTED_MODULE_0__["DiscordModules"].Titles.default, {tag: modules__WEBPACK_IMPORTED_MODULE_0__["DiscordModules"].Titles.Tags.H4}, title),
-                ce(TextElement.default,
+                ce(TextElement,
                     {size: TextElement.Sizes.SMALL, color: TextElement.Colors.PRIMARY, className: modules__WEBPACK_IMPORTED_MODULE_0__["DiscordClasses"].Changelog.date.toString()},
                     "Version " + version
                 )

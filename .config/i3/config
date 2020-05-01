@@ -76,7 +76,7 @@ bindsym $mod+Shift+i		exec --no-startup-id i3resize up
 bindsym $mod+o			sticky toggle
 bindsym $mod+Shift+o		exec --no-startup-id i3resize right
 
-bindsym $mod+a			exec --no-startup-id ddspawn dropdowncalc -f mono:pixelsize=24
+bindsym $mod+a			exec --no-startup-id ddspawn insect -f mono:pixelsize=24
 
 bindsym $mod+s			gaps inner current plus 5
 bindsym $mod+Shift+s		gaps inner current minus 5
@@ -220,6 +220,5 @@ for_window [instance="blueman-manager"] floating enable
 for_window [title="Zoom Group Chat"] floating enable
 for_window [title="Zoom Group Chat"] resize set 330 500
 for_window [title="Zoom Group Chat"] move position 1590 528
-
 
 # exec_always --no-startup-id nm-applet
