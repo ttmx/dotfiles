@@ -7,9 +7,9 @@ browser=${BROWSER:-firefox}
 
 pgrep -x dmenu && exit
 
-choice=$(echo "🦆" | dmenu -i -p "Search DuckDuckGo:") || exit 1
+choice=$(dmenu -c -p "Search 🦆:" -dy ddgsug -l 8) || exit 1
 
-if [ "$choice" = "🦆"  ]; then
+if [ "$choice" = ""  ]; then
     $browser "https://duckduckgo.com"
 else
     if echo "$choice" | grep "^(http:\/\/|https:\/\/)?[a-zA-Z0-9]+\.[a-zA-Z]+(/)?.*$"; then

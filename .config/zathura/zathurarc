@@ -19,4 +19,16 @@ set statusbar-bg "#1b1e2b"
 set statusbar-fg "#a6accd"
 set recolor-lightcolor "#2E3440"
 set recolor-darkcolor "#D8DEE9"
+
+set completion-bg "#1b1e2b"
+set completion-fg "#a6accd"
+set completion-group-bg "#434C5E"
+set completion-group-fg "#a6accd"
+set completion-highlight-bg "#B48EAD"
+set completion-highlight-fg "#ECEFF4"
+set notification-error-bg "#BF616A"
+set notification-warning-bg "#EBCB8B"
+
 set recolor-reverse-video true
+set scroll-page-aware true
+set statusbar-home-tilde true

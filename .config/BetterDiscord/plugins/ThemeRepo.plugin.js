@@ -1,6 +1,7 @@
 //META{"name":"ThemeRepo","authorId":"278543574059057154","invite":"Jx3TjNS","donate":"https://www.paypal.me/MircoWittrien","patreon":"https://www.patreon.com/MircoWittrien","website":"https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/ThemeRepo","source":"https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ThemeRepo/ThemeRepo.plugin.js"}*//
 
 var ThemeRepo = (_ => {
+	var _this;	
 	var loading, cachedThemes, grabbedThemes, foundThemes, loadedThemes, generatorThemes, updateInterval;
 	
 	const themeStates = {
@@ -51,7 +52,7 @@ var ThemeRepo = (_ => {
 	
 	const repoListComponent = class ThemeList extends BdApi.React.Component {
 		render() {
-			let list = BDFDB.ReactUtils.createElement("ul", {
+			let list = BDFDB.ReactUtils.createElement("div", {
 				className: BDFDB.disCN._repolist,
 				style: {
 					display: "flex",
@@ -83,7 +84,7 @@ var ThemeRepo = (_ => {
 					label: "Choose a Generator Theme",
 					basis: "70%",
 					value: this.props.options.currentGenerator || "-----",
-					options: ["-----"].concat(generatorThemes).map(url => {return {value:url, label:(loadedThemes[url] || {}).name || "-----"}}),
+					options: ["-----"].concat(generatorThemes).map(url => {return {value:url, label:(loadedThemes[url] || {}).name || "-----"}}).sort((x, y) => (x.label < y.label ? -1 : x.label > y.label ? 1 : 0)),
 					searchable: true,
 					onChange: (value, instance) => {
 						if (loadedThemes[value.value]) {
@@ -96,7 +97,7 @@ var ThemeRepo = (_ => {
 							delete this.props.options.generatorValues;
 						}
 						delete this.props.options.currentTheme;
-						this.props.plugin.updateList(instance, this.props.options);
+						_this.updateList(instance, this.props.options);
 						this.props.options.preview.executeJavaScriptSafe(`window.onmessage({
 							origin: "ThemeRepo",
 							reason: "NewTheme",
@@ -111,13 +112,13 @@ var ThemeRepo = (_ => {
 					label: "Download generated Theme",
 					children: "Download",
 					onClick: _ => {
-						this.props.plugin.createThemeFile(theme.name + ".theme.css", this.props.plugin.generateTheme(theme, this.props.options));
+						_this.createThemeFile(theme.name + ".theme.css", _this.generateTheme(theme, this.props.options));
 					}
 				}),
 				BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.FormComponents.FormDivider, {
 					className: BDFDB.disCN.marginbottom20
 				}),
-				theme && !forceRerenderGenerator && this.props.plugin.createGeneratorInputs(theme, this.props.options)
+				theme && !forceRerenderGenerator && _this.createGeneratorInputs(theme, this.props.options)
 			].flat(10).filter(n => n)
 		}
 	};
@@ -125,7 +126,7 @@ var ThemeRepo = (_ => {
 	return class ThemeRepo {
 		getName () {return "ThemeRepo";}
 
-		getVersion () {return "1.9.7";}
+		getVersion () {return "1.9.9";}
 
 		getAuthor () {return "DevilBro";}
 
@@ -133,17 +134,19 @@ var ThemeRepo = (_ => {
 
 		constructor () {
 			this.changelog = {
-				"improved":[["Preview","Switched from using and iFrame to using an extra Browser Window to display the preview"]]
+				"fixed":[["Moved repo button","Repo button is now an item in the settings sidebar instead of an extra button in the themes page"]]
 			};
 			
 			this.patchedModules = {
-				after: {
-					V2C_ContentColumn: "render"
+				before: {
+					SettingsView: "render"
 				}
 			};
 		}
 
 		initConstructor () {
+			_this = this;
+			
 			loading = {is:false, timeout:null, amount:0};
 			
 			cachedThemes = [];
@@ -330,9 +333,10 @@ var ThemeRepo = (_ => {
 
 		onUserSettingsCogContextMenu (e) {
 			BDFDB.TimeUtils.timeout(_ => {
-				let [children, index] = BDFDB.ReactUtils.findChildren(e.returnvalue, {props: [["label", "BandagedBD"]]});
-				if (index > -1) children[index].props.render.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ContextMenuItems.Item, {
+				let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {props: [["label", "BandagedBD"]]});
+				if (index > -1 && BDFDB.ArrayUtils.is(children[index].props.children)) children[index].props.children.push(BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
 					label: "Theme Repo",
+					id: BDFDB.ContextMenuUtils.createItemId(this.name, "repo"),
 					action: _ => {
 						if (!loading.is) BDFDB.ContextMenuUtils.close(e.instance);
 						this.openThemeRepoModal();
@@ -341,17 +345,20 @@ var ThemeRepo = (_ => {
 			});
 		}
 		
-		processV2CContentColumn (e) {
-			if (typeof e.instance.props.title == "string" && e.instance.props.title.toUpperCase().indexOf("THEMES") == 0) {
-				let [children, index] = BDFDB.ReactUtils.findChildren(e.returnvalue, {key: "folder-button"});
-				if (index > -1) children.splice(index + 1, 0, BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
-					text: "Open Theme Repo",
-					children: BDFDB.ReactUtils.createElement("button", {
-						className: `${BDFDB.disCNS._repobutton + BDFDB.disCN._repofolderbutton} bd-themerepobutton`,
-						onClick: _ => {this.openThemeRepoModal();},
-						children: "ThemeRepo"
-					})
-				}));
+		processSettingsView (e) {
+			if (BDFDB.ArrayUtils.is(e.instance.props.sections) && e.instance.props.sections[0] && e.instance.props.sections[0].label == BDFDB.LanguageUtils.LanguageStrings.USER_SETTINGS && !e.instance.props.sections.find(n => n.section == "themerepo")) {
+				let oldSettings = !e.instance.props.sections.find(n => n.section == "themes");
+				let isPRinjected = oldSettings && e.instance.props.sections.find(n => n.section == "pluginrepo");
+				let search = oldSettings ? (isPRinjected ? n => n.section == "pluginrepo" : n => n.section == BDFDB.DiscordConstants.UserSettingsSections.DEVELOPER_OPTIONS) : n => n.section == BDFDB.DiscordConstants.UserSettingsSections.CHANGE_LOG || n.section == "changelog"
+				let index = e.instance.props.sections.indexOf(e.instance.props.sections.find(search));
+				if (index > -1) {
+					e.instance.props.sections.splice(oldSettings ? index + 1 : index - 1, 0, {
+						label: "Theme Repo",
+						section: "themerepo",
+						onClick: _ => {this.openThemeRepoModal();}
+					});
+					if (oldSettings && !isPRinjected) e.instance.props.sections.splice(index + 1, 0, {section: "DIVIDER"});
+				}
 			}
 		}
 		
@@ -365,7 +372,7 @@ var ThemeRepo = (_ => {
 			if (loading.is) BDFDB.NotificationUtils.toast(`Themes are still being fetched. Try again in some seconds.`, {type:"danger"});
 			else {				
 				let modalSettings = BDFDB.DataUtils.get(this, "modalSettings");
-				let searchTimeout, automaticLoading = BDFDB.BDUtils.isAutoLoadEnabled();
+				let searchTimeout, automaticLoading = BDFDB.BDUtils.getSettings(BDFDB.BDUtils.settingsIds.automaticLoading);
 				options = Object.assign(options, modalSettings);
 				options.updated = options.updated && !options.showOnlyOutdated;
 				options.outdated = options.updated || options.showOnlyOutdated;
@@ -467,14 +474,12 @@ var ThemeRepo = (_ => {
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
 							tab: "Themes",
 							children: BDFDB.ReactUtils.createElement(repoListComponent, {
-								plugin: this,
 								entries: entries
 							})
 						}),
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
 							tab: "Generator",
 							children: BDFDB.ReactUtils.createElement(generatorComponent, {
-								plugin: this,
 								options: options
 							})
 						}),
@@ -514,7 +519,7 @@ var ThemeRepo = (_ => {
 									className: BDFDB.disCN.marginbottom20,
 									type: "Switch",
 									label: "Preview with normalized classes",
-									value: BDFDB.BDUtils.getSettings("fork-ps-4"),
+									value: BDFDB.BDUtils.getSettings(BDFDB.BDUtils.settingsIds.normalizedClasses),
 									onChange: (value, instance) => {
 										options.preview.executeJavaScriptSafe(`window.onmessage({
 											origin: "ThemeRepo",
@@ -711,7 +716,7 @@ var ThemeRepo = (_ => {
 										this.deleteThemeFile(theme);
 										BDFDB.TimeUtils.timeout(_ => {
 											this.updateList(instance, options);
-											if (!BDFDB.BDUtils.isAutoLoadEnabled()) this.removeTheme(theme);
+											this.removeTheme(theme);
 										}, 3000);
 									}
 								})
@@ -979,7 +984,7 @@ var ThemeRepo = (_ => {
 					
 					let loadingTooltip = document.querySelector(".themerepo-loading-tooltip");
 					if (loadingTooltip) {
-						BDFDB.DOMUtils.setText(loadingTooltip, this.getLoadingTooltipText());
+						BDFDB.DOMUtils.setText(loadingTooltip.querySelector(BDFDB.dotCN.tooltipcontent), this.getLoadingTooltipText());
 						loadingTooltip.update();
 					}
 					

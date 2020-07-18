@@ -5,7 +5,7 @@ case $BLOCK_BUTTON in
     3) pgrep -x dunst >/dev/null && notify-send "🔋 Battery module" "🔋: discharging
 🛑: not charging
 ♻: stagnant charge
-: charging
+: charging
 ⚡: charged
 : battery very low!
 - Text color reflects charge left" ;;
@@ -15,23 +15,48 @@ for battery in /sys/class/power_supply/BAT?
 do
 capacity=$(cat "$battery"/capacity) || exit
 status=$(cat "$battery"/status)
-
-if [ "$capacity" -ge 75 ]; then
-	color="#7ca075"
-	batsymb=""
-elif [ "$capacity" -ge 50 ]; then
-	color="#a5abcc"
-	batsymb=""
-elif [ "$capacity" -ge 25 ]; then
-	color="#a0757c"
-	batsymb=""
+wm=$(wmctrl -m |grep Name| awk '{print $2}')
+if [ "$wm" = "i3" ]; then
+	str="<span color='%s'>%s%s</span>\n"
+	if [ "$capacity" -ge 75 ]; then
+		color="#7ca075"
+	elif [ "$capacity" -ge 30 ]; then
+		color="#a5accd"
+	elif [ "$capacity" -ge 15 ]; then
+		color="#a0757c"
+	else
+		color="#ff0000"
+	fi
 else
-	color="#ff0000"
-	batsymb=""
+	str="%s%s%s\n"
+	if [ "$capacity" -ge 75 ]; then
+		color=""
+	elif [ "$capacity" -ge 30 ]; then
+		color=""
+	elif [ "$capacity" -ge 15 ]; then
+		color="	"
+	else
+		color=""
+	fi
 fi
 
 
+if [ "$capacity" -ge 75 ]; then
+	batsymb=""
+elif [ "$capacity" -ge 50 ]; then
+	batsymb=""
+elif [ "$capacity" -ge 25 ]; then
+	batsymb=""
+elif [ "$capacity" -ge 6 ]; then
+	batsymb=""
+else
+	batsymb=""
+fi
+
+#[ "$status" = "Charging" ] && color=""
 [ "$status" = "Charging" ] && color="#7ca075"
 
-printf "<span color='%s'>%s%s</span>\n" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not Charging/🛑/;s/Charging//;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
+printf "$str" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not charging/ /;s/Charging/ /;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
 done
+
+

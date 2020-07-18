@@ -20,13 +20,8 @@ Plug 'tpope/vim-commentary'
 Plug 'vifm/vifm.vim'
 Plug 'kovetskiy/sxhkd-vim'
 Plug 'arcticicestudio/nord-vim'
-" React
-Plug 'pangloss/vim-javascript'
-Plug 'mxw/vim-jsx'
-Plug 'mattn/emmet-vim'
-Plug 'w0rp/ale'
-Plug 'skywind3000/asyncrun.vim'
-
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'jackguo380/vim-lsp-cxx-highlight'
 call plug#end()
 
 
@@ -35,6 +30,7 @@ set go=a
 set mouse=a
 set nohlsearch
 set clipboard+=unnamedplus
+set termguicolors
 
 " Some basics:
 	nnoremap c "_c
@@ -49,7 +45,7 @@ set clipboard+=unnamedplus
 	autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
 
 " Goyo plugin makes text more readable when writing prose:
-	map <leader>f :Goyo \| set bg=light \| set linebreak<CR>
+	map <leader>f :Goyo \| set linebreak<CR>
 
 " Spell-check set to <leader>o, 'o' for 'orthography':
 	map <leader>o :setlocal spell! spelllang=en_us<CR>
@@ -77,10 +73,6 @@ set clipboard+=unnamedplus
 " Check file in shellcheck:
 	map <leader>s :!clear && shellcheck %<CR>
 
-" Open my bibliography file in split
-	map <leader>b :vsp<space>$BIB<CR>
-	map <leader>r :vsp<space>$REFER<CR>
-
 " Replace all is aliased to S.
 	nnoremap S :%s//g<Left><Left>
 
@@ -103,7 +95,7 @@ set clipboard+=unnamedplus
 " Enable Goyo by default for mutt writting
 	" Goyo's width will be the line limit in mutt.
 	autocmd BufRead,BufNewFile /tmp/neomutt* let g:goyo_width=80
-	autocmd BufRead,BufNewFile /tmp/neomutt* :Goyo \| set bg=light
+	autocmd BufRead,BufNewFile /tmp/neomutt* :Goyo \| set bg=dark
 
 " Automatically deletes all trailing whitespace on save.
 	autocmd BufWritePre * %s/\s\+$//e
@@ -116,8 +108,8 @@ set clipboard+=unnamedplus
 
 " Run xrdb whenever Xdefaults or Xresources are updated.
 	autocmd BufWritePost *Xresources,*Xdefaults !xrdb %
-" Restart compton whenever compton conf is updated
-	autocmd BufWritePost *compton.conf !pkill compton; compton &
+" Restart picom whenever compton conf is updated
+	autocmd BufWritePost *picom.conf !pkill picom; picom &
 
 
 " Navigating with guides
@@ -237,19 +229,87 @@ set clipboard+=unnamedplus
 	autocmd FileType xml inoremap ,e <item><Enter><title><++></title><Enter><guid<space>isPermaLink="false"><++></guid><Enter><pubDate><Esc>:put<Space>=strftime('%a, %d %b %Y %H:%M:%S %z')<Enter>kJA</pubDate><Enter><link><++></link><Enter><description><![CDATA[<++>]]></description><Enter></item><Esc>?<title><enter>cit
 	autocmd FileType xml inoremap ,a <a href="<++>"><++></a><++><Esc>F"ci"
 
-""".jsx
-    let g:user_emmet_leader_key='<Tab>'
-let g:user_emmet_settings = {
-  \  'javascript.jsx' : {
-    \      'extends' : 'jsx',
-    \  },
-  \}
+""" CoC
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-let g:ale_sign_error = '' " Less aggressive than the default '>>'
-let g:ale_sign_warning = '.'
-let g:ale_lint_on_enter = 0 " Less distracting when opening a new file
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
 
-autocmd BufWritePost *.js AsyncRun -post=checktime ./node_modules/.bin/eslint --fix %
+inoremap <silent><expr> <c-space> coc#refresh()
 
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+" <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Formatting selected code.
+xmap =  <Plug>(coc-format-selected)
+nmap =  <Plug>(coc-format-selected)
+
+" Remap keys for applying codeAction to the current line.
+nmap <leader>ac  <Plug>(coc-codeaction)
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Show all diagnostics.
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions.
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands.
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document.
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols.
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list.
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 colorscheme nord
+
+" Use W to call sudo to write a read only file with elevated privileges
+command W :execute ':silent w !sudo tee % >/dev/null' |:edit!
+
+highlight Normal guibg=NONE
+highlight LineNr guibg=NONE
+highlight SignColumn guibg=NONE
+highlight CursorLineNr guibg=NONE

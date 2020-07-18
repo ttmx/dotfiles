@@ -60,14 +60,15 @@ signal=10
 [battery]
 command=battery BAT0
 interval=5
+signal=11
 
 [internet]
 interval=10
 
-[clock]
+[currentdate]
 interval=30
 
-[time]
+[clock]
 interval=15
 
 #[help]

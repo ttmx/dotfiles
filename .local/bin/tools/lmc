@@ -29,7 +29,7 @@ Allowed options:
   prev		Previous track
   toggle	Toggle pause
   truepause	Pause
-  foward NUM	Seek foward in song (2 secs default)
+  foward NUM	Seek forward in song (2 secs default)
   back NUM	Seek back in song (2 secs default)
   restart	Restart current song
   all else	Print this message
@@ -39,4 +39,7 @@ i.e. \`lmc r\` for \`lmc restart\`.
 EOF
 esac
 
-pkill -RTMIN+10 i3blocks
+blocks=wmctrl -m |grep "Name" |awk '{printf $2}'
+blocks+="blocks"
+
+pkill -RTMIN+10 $blocks

@@ -2,7 +2,7 @@
 # Dependencies are xclip and xorg-xprop.
 # qrencode required for qrcode generation.
 # groff/zathura required for man pages.
-prim="$(xclip -o)"; [ -z "$prim" ] && exit
+prim="$(xclip -o -selection clipboard)"; [ -z "$prim" ] && exit
 
 PID=$(xprop -id "$(xprop -root | awk '/_NET_ACTIVE_WINDOW\(WINDOW\)/{print $NF}')" | grep -m 1 PID | cut -d " " -f 3)
 PID=$(echo "$(pstree -lpA "$PID" | tail -n 1)" | awk -F'---' '{print $NF}' | sed -re 's/[^0-9]//g')
@@ -15,7 +15,7 @@ wikipedia() { "$BROWSER" "https://en.wikipedia.org/wiki/$@" ;}
 wiktionary() { "$BROWSER" "https://en.wiktionary.org/wiki/$@" ;}
 maps() { "$BROWSER" "https://www.openstreetmap.org/search?query=$@" ;}
 ebay() { "$BROWSER" "https://www.ebay.com/sch/$@" ;}
-termbin() { "echo" "-ne '$@' |nc termbin.com 9999 | xclip -i -selection clipboard" ;}
+termbin() { "echo" "-ne '$@' |nc termbin.com 9999 | xclip -selection clipboard" ;}
 
 echo "$prim" | grep "^.*\.[A-Za-z]\+.*" >/dev/null && gotourl() { "$BROWSER" "$@" ;}
 echo "$prim" | grep "^.*@.*\.[A-Za-z]\+$" >/dev/null && email() { xdg-email "$@" ;}

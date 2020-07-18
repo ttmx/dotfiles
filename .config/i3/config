@@ -10,11 +10,14 @@
 #exec_always "xrdb ~/.Xdefaults"
 
 # #---Basic Definitions---# #
-for_window [class="^.*"] border pixel 0
+for_window [class="^.*"] border pixel 3
+hide_edge_borders smart
+focus_on_window_activation focus
 gaps inner 15
 gaps outer 15
 set $term --no-startup-id $TERMINAL
 set $mod Mod4
+font pango:Ubuntu
 
 # #---Dropdown Windows---# #
 # General dropdown window traits. The order can matter.
@@ -29,7 +32,7 @@ for_window [instance="dropdown_dropdowncalc"] border pixel 2
 for_window [instance="dropdown_*"] move position center
 
 bar {
-	font pango:Font Awesome 5 Free 10
+	font pango:Ubuntu, Font Awesome 5 Free 10
 	status_command i3blocks
 	position top
 	mode dock
@@ -42,102 +45,104 @@ bar {
 		focused_workspace	#363b56		#363b56		#ffffff
 		inactive_workspace	#1b1e2b		#1b1e2b		#757ca1
 		active_workspace	#1b1e2b		#1b1e2b		#757ca1
+		urgent_workspace   	#1b1e2b 	#bf616a 	#ffffff
 	}
 }
-
-# #---Basic Bindings---# #
-bindsym $mod+Shift+Return	exec --no-startup-id samedir
-
-bindsym $mod+Shift+space 	floating toggle
+# class                 border  backgr. text    indicator child_border
+client.focused          #81A1C1 #81A1C1 #ffffff #2e9ef4   #81A1C1
+client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
+client.unfocused        #333333 #434C5E #888888 #292d2e   #434C5E
+client.urgent           #2f343a #bf616a #ffffff #bf616a   #bf616a
+client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
+# #---basic bindings---# #
+bindsym $mod+shift+space 	floating toggle
 bindsym $mod+space		focus mode_toggle
 
 bindsym $mod+Escape		workspace prev
-#bindsym $mod+Shift+Escape 	exec --no-startup-id prompt "Exit i3?" "i3-msg exit"
+#bindsym $mod+shift+escape 	exec --no-startup-id prompt "Exit i3?" "i3-msg exit"
 
-#STOP/HIDE EVERYTHING:
-bindsym $mod+Shift+Delete	exec --no-startup-id pulsemixer --mute ; exec --no-startup-id lmc pause ; exec --no-startup-id pauseallmpv; workspace 0; exec $term -e htop ; exec $term -e $FILE
+#stop/hide everything:
+bindsym $mod+shift+Delete	exec --no-startup-id pulsemixer --mute ; exec --no-startup-id lmc pause ; exec --no-startup-id pauseallmpv; workspace 0; exec $term -e htop ; exec $term -e $FILE
 
-# #---Letter Key Bindings---# #
+# #---letter key bindings---# #
 bindsym $mod+q			[con_id="__focused__" instance="^(?!dropdown_).*$"] kill
-bindsym $mod+Shift+q		[con_id="__focused__" instance="^(?!dropdown_).*$"] exec --no-startup-id kill -9 `xdotool getwindowfocus getwindowpid`
+bindsym $mod+shift+q		[con_id="__focused__" instance="^(?!dropdown_).*$"] exec --no-startup-id kill -9 `xdotool getwindowfocus getwindowpid`
 
-bindsym $mod+Shift+r		exec --no-startup-id winresize
+bindsym $mod+shift+r		exec --no-startup-id winresize
 
 bindsym $mod+t			split toggle
-bindsym $mod+Shift+t		gaps inner current set 15; gaps outer current set 15
+bindsym $mod+shift+t		gaps inner current set 15; gaps outer current set 15
 
-bindsym $mod+Shift+y		exec --no-startup-id i3resize left
+bindsym $mod+shift+y		exec --no-startup-id i3resize left
 
 bindsym $mod+u			exec --no-startup-id ddspawn tmuxdd
-bindsym $mod+Shift+u		exec --no-startup-id i3resize down
+bindsym $mod+shift+u		exec --no-startup-id i3resize down
 
-bindsym $mod+Shift+i		exec --no-startup-id i3resize up
+bindsym $mod+shift+i		exec --no-startup-id i3resize up
 
 bindsym $mod+o			sticky toggle
-bindsym $mod+Shift+o		exec --no-startup-id i3resize right
+bindsym $mod+shift+o		exec --no-startup-id i3resize right
 
 bindsym $mod+a			exec --no-startup-id ddspawn insect -f mono:pixelsize=24
 
 bindsym $mod+s			gaps inner current plus 5
-bindsym $mod+Shift+s		gaps inner current minus 5
+bindsym $mod+shift+s		gaps inner current minus 5
 
-bindsym $mod+Shift+d		gaps inner current set 0; gaps outer current set 0
+bindsym $mod+shift+d		gaps inner current set 0; gaps outer current set 0
 
-set $freeze Distraction-free mode (super+shift+f to reactivate bindings)
+set $freeze distraction-free mode (super+shift+f to reactivate bindings)
 mode "$freeze" { bindsym $mod+Shift+f mode "default"
 }
 
 bindsym $mod+f			fullscreen toggle
-bindsym $mod+Shift+f		mode "$freeze" ;; exec --no-startup-id notify-send "Distraction-free mode activated." "Press Super+Shift+f to return."
+bindsym $mod+shift+f		mode "$freeze" ;; exec --no-startup-id notify-send "Distraction-free mode activated." "Press Super+Shift+f to return."
 
 bindsym $mod+g			workspace prev
 
 bindsym $mod+h			focus left
-bindsym $mod+Shift+h		move left 30
-bindsym $mod+Ctrl+h		move workspace to output left
+bindsym $mod+shift+h		move left 30
+bindsym $mod+ctrl+h		move workspace to output left
 
 bindsym $mod+j			focus down
-bindsym $mod+Shift+j		move down 30
-bindsym $mod+Ctrl+j		move workspace to output down
+bindsym $mod+shift+j		move down 30
+bindsym $mod+ctrl+j		move workspace to output down
 
 bindsym $mod+k			focus up
-bindsym $mod+Shift+k		move up 30
-bindsym $mod+Ctrl+k		move workspace to output up
+bindsym $mod+shift+k		move up 30
+bindsym $mod+ctrl+k		move workspace to output up
 
 bindsym $mod+l			focus right
-bindsym $mod+Shift+l		move right 30
-bindsym $mod+Ctrl+l		move workspace to output right
+bindsym $mod+shift+l		move right 30
+bindsym $mod+ctrl+l		move workspace to output right
 
 bindsym $mod+z			gaps outer current plus 5
-bindsym $mod+Shift+z		gaps outer current minus 5
+bindsym $mod+shift+z		gaps outer current minus 5
 
 bindsym $mod+c			exec --no-startup-id cabl
 
-bindsym $mod+v			exec --no-startup-id $term -e $EDITOR -c "VimwikiIndex"
-
 bindsym $mod+b			bar mode toggle
-bindsym $mod+Shift+b		floating toggle; sticky toggle; exec --no-startup-id hover left
+bindsym $mod+shift+b		floating toggle; sticky toggle; exec --no-startup-id hover left
 
-bindsym $mod+Shift+n		floating toggle; sticky toggle; exec --no-startup-id hover right
+bindsym $mod+shift+n		floating toggle; sticky toggle; exec --no-startup-id hover right
 
-# #---Workspace Bindings---# #
-bindsym $mod+Home		workspace $ws1
-bindsym $mod+Shift+Home		move container to workspace $ws1
-bindsym $mod+End		workspace $ws10
-bindsym $mod+Shift+End		move container to workspace $ws10
-bindsym $mod+Prior		workspace prev
-bindsym $mod+Shift+Prior	move container to workspace prev
-bindsym $mod+Next		workspace next
-bindsym $mod+Shift+Next		move container to workspace next
+# #---workspace bindings---# #
+#bindsym $mod+home		workspace $ws1
+#bindsym $mod+shift+home		move container to workspace $ws1
+#bindsym $mod+end		workspace $ws10
+#bindsym $mod+shift+end		move container to workspace $ws10
+#bindsym $mod+prior		workspace prev
+#bindsym $mod+shift+prior	move container to workspace prev
+#bindsym $mod+next		workspace next
+#bindsym $mod+shift+next		move container to workspace next
 bindsym $mod+Tab		workspace back_and_forth
-bindsym $mod+XF86Back		workspace prev
-bindsym $mod+Shift+XF86Back	move container to workspace prev
-bindsym $mod+XF86Forward	workspace next
-bindsym $mod+Shift+XF86Forward	move container to workspace next
-bindsym $mod+semicolon		workspace next
+#bindsym $mod+xf86back		workspace prev
+#bindsym $mod+shift+xf86back	move container to workspace prev
+#bindsym $mod+xf86forward	workspace next
+#bindsym $mod+shift+xf86forward	move container to workspace next
+#bindsym $mod+semicolon		workspace next
 #bindsym $mod+apostrophe		split horizontal ;; exec $term
 #bindsym $mod+slash		split vertical ;; exec $term
-#bindsym $mod+Shift+slash	kill
+#bindsym $mod+shift+slash	kill
 bindsym $mod+backslash		workspace back_and_forth
 
 set $ws1 "1"
@@ -164,18 +169,18 @@ bindsym $mod+9		workspace $ws9
 bindsym $mod+0		workspace $ws10
 
 # move focused container to workspace
-bindsym $mod+Shift+1	move container to workspace $ws1
-bindsym $mod+Shift+2	move container to workspace $ws2
-bindsym $mod+Shift+3	move container to workspace $ws3
-bindsym $mod+Shift+4	move container to workspace $ws4
-bindsym $mod+Shift+5	move container to workspace $ws5
-bindsym $mod+Shift+6	move container to workspace $ws6
-bindsym $mod+Shift+7	move container to workspace $ws7
-bindsym $mod+Shift+8	move container to workspace $ws8
-bindsym $mod+Shift+9	move container to workspace $ws9
-bindsym $mod+Shift+0	move container to workspace $ws10
+bindsym $mod+shift+1	move container to workspace $ws1
+bindsym $mod+shift+2	move container to workspace $ws2
+bindsym $mod+shift+3	move container to workspace $ws3
+bindsym $mod+shift+4	move container to workspace $ws4
+bindsym $mod+shift+5	move container to workspace $ws5
+bindsym $mod+shift+6	move container to workspace $ws6
+bindsym $mod+shift+7	move container to workspace $ws7
+bindsym $mod+shift+8	move container to workspace $ws8
+bindsym $mod+shift+9	move container to workspace $ws9
+bindsym $mod+shift+0	move container to workspace $ws10
 
-for_window [class="Pinentry"] sticky enable
+for_window [class="pinentry"] sticky enable
 for_window [class="sent"] border pixel 0px
 for_window [title="GIMP Startup"] move workspace $ws5
 for_window [class="Gimp"] move workspace $ws5
@@ -209,16 +214,20 @@ bindsym $mod+Shift+Right 	move right
 
 # #---Assign---# #
 
-for_window [instance="discord"] move to workspace $ws10
+#for_window [instance="discord"] move to workspace $ws10
 assign [instance="discord"] workspace $ws10
 
-for_window [instance="spotify"] move to workspace $ws9 ; gaps outer 0 ; gaps inner 0
-assign [instance="spotify"] move to workspace $ws9
+#for_window [instance="spotify"] move to workspace $ws9
+assign [instance="spotify"] workspace $ws9
 
 for_window [instance="blueman-manager"] floating enable
 
 for_window [title="Zoom Group Chat"] floating enable
 for_window [title="Zoom Group Chat"] resize set 330 500
 for_window [title="Zoom Group Chat"] move position 1590 528
+
+# #---Floating---# #
+floating_modifier $mod
+
 
 # exec_always --no-startup-id nm-applet

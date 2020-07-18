@@ -8,3 +8,5 @@ vv	~/Videos
 cf	~/.config
 sc	~/.local/bin
 mn	/mnt
+src ~/Documents/src
+tor ~/Documents/Torrents

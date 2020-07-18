@@ -51,7 +51,7 @@ var PluginRepo = (_ => {
 	
 	const repoListComponent = class PluginList extends BdApi.React.Component {
 		render() {
-			let list = BDFDB.ReactUtils.createElement("ul", {
+			let list = BDFDB.ReactUtils.createElement("div", {
 				className: BDFDB.disCN._repolist,
 				style: {
 					display: "flex",
@@ -69,7 +69,7 @@ var PluginRepo = (_ => {
 	return class PluginRepo {
 		getName () {return "PluginRepo";} 
 
-		getVersion () {return "1.9.7";}
+		getVersion () {return "1.9.9";}
 
 		getAuthor () {return "DevilBro";}
 
@@ -77,12 +77,12 @@ var PluginRepo = (_ => {
 
 		constructor () {
 			this.changelog = {
-				"improved":[["Loading","Switched from using and iFrame to using an extra Browser Window to load the plugin list, should be faster too"]]
-			};	
+				"fixed":[["Moved repo button","Repo button is now an item in the settings sidebar instead of an extra button in the plugins page"]]
+			};
 			
 			this.patchedModules = {
-				after: {
-					V2C_ContentColumn: "render"
+				before: {
+					SettingsView: "render"
 				}
 			};
 		}
@@ -273,9 +273,10 @@ var PluginRepo = (_ => {
 
 		onUserSettingsCogContextMenu (e) {
 			BDFDB.TimeUtils.timeout(_ => {
-				let [children, index] = BDFDB.ReactUtils.findChildren(e.returnvalue, {props: [["label", "BandagedBD"]]});
-				if (index > -1) children[index].props.render.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ContextMenuItems.Item, {
+				let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {props: [["label", "BandagedBD"]]});
+				if (index > -1 && BDFDB.ArrayUtils.is(children[index].props.children)) children[index].props.children.push(BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuItem, {
 					label: "Plugin Repo",
+					id: BDFDB.ContextMenuUtils.createItemId(this.name, "repo"),
 					action: _ => {
 						if (!loading.is) BDFDB.ContextMenuUtils.close(e.instance);
 						this.openPluginRepoModal();
@@ -284,17 +285,19 @@ var PluginRepo = (_ => {
 			});
 		}
 		
-		processV2CContentColumn (e) {
-			if (typeof e.instance.props.title == "string" && e.instance.props.title.toUpperCase().indexOf("PLUGINS") == 0) {
-				let [children, index] = BDFDB.ReactUtils.findChildren(e.returnvalue, {key: "folder-button"});
-				if (index > -1) children.splice(index + 1, 0, BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
-					text: "Open Plugin Repo",
-					children: BDFDB.ReactUtils.createElement("button", {
-						className: `${BDFDB.disCNS._repobutton + BDFDB.disCN._repofolderbutton} bd-pluginrepobutton`,
-						onClick: _ => {this.openPluginRepoModal();},
-						children: "PluginRepo"
-					})
-				}));
+		processSettingsView (e) {
+			if (BDFDB.ArrayUtils.is(e.instance.props.sections) && e.instance.props.sections[0] && e.instance.props.sections[0].label == BDFDB.LanguageUtils.LanguageStrings.USER_SETTINGS && !e.instance.props.sections.find(n => n.section == "pluginrepo")) {
+				let oldSettings = !e.instance.props.sections.find(n => n.section == "plugins");
+				let search = oldSettings ? n => n.section == BDFDB.DiscordConstants.UserSettingsSections.DEVELOPER_OPTIONS : n => n.section == BDFDB.DiscordConstants.UserSettingsSections.CHANGE_LOG || n.section == "changelog"
+				let index = e.instance.props.sections.indexOf(e.instance.props.sections.find(search));
+				if (index > -1) {
+					e.instance.props.sections.splice(oldSettings ? index + 1 : index - 1, 0, {
+						label: "Plugin Repo",
+						section: "pluginrepo",
+						onClick: _ => {this.openPluginRepoModal();}
+					});
+					if (oldSettings) e.instance.props.sections.splice(index + 1, 0, {section: "DIVIDER"});
+				}
 			}
 		}
 		
@@ -307,7 +310,7 @@ var PluginRepo = (_ => {
 			if (loading.is) BDFDB.NotificationUtils.toast(`Plugins are still being fetched. Try again in some seconds.`, {type:"danger"});
 			else {
 				let modalSettings = BDFDB.DataUtils.get(this, "modalSettings");
-				let searchTimeout, automaticLoading = BDFDB.BDUtils.isAutoLoadEnabled();
+				let searchTimeout, automaticLoading = BDFDB.BDUtils.getSettings(BDFDB.BDUtils.settingsIds.automaticLoading);
 				options = Object.assign(options, modalSettings);
 				options.updated = options.updated && !options.showOnlyOutdated;
 				options.outdated = options.updated || options.showOnlyOutdated;
@@ -519,7 +522,7 @@ var PluginRepo = (_ => {
 										this.deletePluginFile(plugin);
 										BDFDB.TimeUtils.timeout(_ => {
 											this.updateList(instance, options);
-											if (!BDFDB.BDUtils.isAutoLoadEnabled()) this.stopPlugin(plugin);
+											this.stopPlugin(plugin);
 										}, 3000);
 									}
 								})
@@ -672,15 +675,15 @@ var PluginRepo = (_ => {
 							/* code is minified -> add newlines */
 							bodyCopy = body.replace(/}/g, "}\n");
 						}
-						let bodyWithoutSpecial = bodyCopy.replace(/\n|\r|\t/g, "").replace(/\n|\r|\t/g, "");
-						let configReg = /(\.exports|config)\s*=\s*\{\s*["'`]*info["'`]*\s*:\s*/i.exec(bodyWithoutSpecial);
+						let bodyWithoutSpecial = bodyCopy.replace(/\n|\r|\t/g, "").replace(/\n|\r|\t/g, "").replace(/\s{2,}/g, "");
+						let configReg = /(\.exports|config)\s*=\s*\{(.*?)\s*["'`]*info["'`]*\s*:\s*/i.exec(bodyWithoutSpecial);
 						if (url != "https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/PluginRepo/PluginRepo.plugin.js" && configReg) {
 							try {
 								extractConfigInfo(plugin, JSON.parse('{"info":' + bodyWithoutSpecial.substring(configReg.index).split(configReg[0])[1].split("};")[0].split("}},")[0] + '}'));
 							}
 							catch (err) {
+								let i = 0, j = 0, configString = "";
 								try {
-									let i = 0, j = 0, configString = "";
 									for (let c of (bodyWithoutSpecial.substring(configReg.index).split(configReg[0])[1].split("};")[0].split("}},")[0]).replace(/,/g, ',"').replace(/:/g, '":').replace(/{/g, '{"').replace(/""/g, '"').replace(/" /g, ' ').replace(/,"{/g, ',{').replace(/,"\[/g, ',[').replace(/":\/\//g, ':\/\/')) {
 										configString += c;
 										if (c == "{") i++;
@@ -689,7 +692,12 @@ var PluginRepo = (_ => {
 									}
 									extractConfigInfo(plugin, JSON.parse('{"info":' + configString + '}'));
 								}
-								catch (err2) {}
+								catch (err2) {
+									try {
+										extractConfigInfo(plugin, JSON.parse(('{"info":' + configString + '}').replace(/'/g, "\"")));
+									}
+									catch (err3) {}
+								}
 							}
 						}
 						else {
@@ -723,7 +731,7 @@ var PluginRepo = (_ => {
 					
 					let loadingTooltip = document.querySelector(".pluginrepo-loading-tooltip");
 					if (loadingTooltip) {
-						BDFDB.DOMUtils.setText(loadingTooltip, this.getLoadingTooltipText());
+						BDFDB.DOMUtils.setText(loadingTooltip.querySelector(BDFDB.dotCN.tooltipcontent), this.getLoadingTooltipText());
 						loadingTooltip.update();
 					}
 					

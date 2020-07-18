@@ -3,12 +3,15 @@
 		"hoverDelay": 0
 	},
 	"blacklist": [],
+	"categorydata": {
+		"collapsed": []
+	},
 	"categorystatus": {
 		"86004744966914048": true,
 		"244230771232079873": true
 	},
 	"changelog": {
-		"currentversion": "2.7.3"
+		"currentversion": "2.7.8"
 	},
 	"settings": {
 		"showAnnouncement": true,
