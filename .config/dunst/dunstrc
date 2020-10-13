@@ -88,7 +88,7 @@
     foreground = "#eceff4"
 	frame_color = "#81a1c1"
     timeout = 5
-	set_transient
+	set_transient = true
 
 [urgency_critical]
     background = "#bf616a"
@@ -114,6 +114,11 @@
 # to "".
 # NOTE: It might be helpful to run dunst -print in a terminal in order
 # to find fitting options for rules.
+
+[brave-ads]
+	appname = Brave
+	summary = {*Lenovo*,*Proton*,Crocs*,*BAT*,*Offer*}
+	format = ""
 
 #[espeak]
 #    summary = "*"

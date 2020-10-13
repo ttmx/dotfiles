@@ -9,8 +9,8 @@ super + r
 	$TERMINAL -e $FILE
 super + e
 	$TERMINAL -e neomutt
-super + m
-	$TERMINAL -e ncmpcpp
+# super + m
+# 	$TERMINAL -e ncmpcpp
 super + n
 	$TERMINAL -e newsboat
 super + i
@@ -21,10 +21,14 @@ super + shift + a
 	$TERMINAL -e pulsemixer; pkill -RTMIN+10 i3blocks
 super + shift + c
 	camtoggle
+super + m
+	python ~/Uni/.scripts/rofi-courses.py
+super + shift + m
+	python ~/Uni/.scripts/newscript/openlink.py
 super + shift + e
 	tutorialvids
 super + w
-	webby | xargs -r $BROWSER
+	$BROWSER
 super + shift + w
 	$BROWSER
 super + shift + g

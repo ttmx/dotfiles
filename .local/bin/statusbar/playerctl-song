@@ -22,7 +22,7 @@ def on_metadata(player, e=None):
     e = player.props.metadata if e is None else e
     if player_is_running(PLAYER_NAME):
         #icon = ICON_PLAY if player.props.status == 'Playing' else ICON_PAUSE
-        print('{artist} - {title}'.format(artist=e['xesam:artist'][0], title=e['xesam:title']))
+        print('{artist} <span color="#757ca1">-</span> {title}'.format(artist=e['xesam:artist'][0], title=e['xesam:title']))
     sys.exit(0)
 
 

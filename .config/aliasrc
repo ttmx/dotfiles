@@ -2,7 +2,6 @@
 alias ka="killall" \
 	mkd="mkdir -pv" \
 	mpv="mpv --input-ipc-server=/tmp/mpvsoc$(date +%s)" \
-	calcurse="calcurse -D ~/.config/calcurse" \
 	magit="nvim -c MagitOnly" \
 	p="sudo pacman" \
 	SS="sudo systemctl" \
@@ -14,7 +13,6 @@ alias ka="killall" \
 	x="sxiv -ft *" \
 	sdn="sudo shutdown -h now" \
 	gua="git remote | xargs -L1 git push --all" \
-	ls="ls -hN --color=auto --group-directories-first" \
 	grep="grep --color=auto" \
 	diff="diff --color=auto" \
 	ccat="highlight --out-format=ansi" \
@@ -30,7 +28,8 @@ alias ka="killall" \
 	config='/usr/bin/git --git-dir=$HOME/Documents/dotfiles --work-tree=$HOME' \
 	rot13="tr 'A-Za-z' 'N-ZA-Mn-za-m'"\
 	tb="nc termbin.com 9999"\
-	ls="exa"
+	ls="exa"\
+	cproj="source $(which cproj)"
 
 command -v nvim >/dev/null && alias vim="nvim" vimdiff="nvim -d" # Use neovim for vim if present.
 

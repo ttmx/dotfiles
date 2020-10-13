@@ -11,6 +11,10 @@ signal=9
 instance=spotify
 interval=repeat
 
+[uni-countdown]
+command=python -u ~/Uni/.scripts/newscript/countdown.py
+interval=60
+
 #[news]
 #label=📰
 #interval=once
@@ -40,6 +44,13 @@ signal=7
 [memory]
 interval=30
 label=
+
+[nettraffic]
+interval=5
+
+[cpu-usage]
+interval=5
+label=
 
 [cpu]
 interval=15

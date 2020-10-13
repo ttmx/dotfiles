@@ -222,9 +222,10 @@ assign [instance="spotify"] workspace $ws9
 
 for_window [instance="blueman-manager"] floating enable
 
-for_window [title="Zoom Group Chat"] floating enable
-for_window [title="Zoom Group Chat"] resize set 330 500
-for_window [title="Zoom Group Chat"] move position 1590 528
+for_window [title="Chat"] floating enable
+for_window [title="Chat"] resize set 330 500
+for_window [title="Chat"] move position 1590 528
+for_window [title="pulsemixer"] floating enable
 
 # #---Floating---# #
 floating_modifier $mod
