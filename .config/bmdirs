@@ -9,6 +9,7 @@ cf	~/.config
 sc	~/.local/bin
 mn	/mnt
 src ~/Documents/src
+sh  /mnt/share
 tor ~/Documents/Torrents
 w   ~/Images/webm
 u 	~/Uni/sem-5

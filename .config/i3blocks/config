@@ -12,7 +12,7 @@ instance=spotify
 interval=repeat
 
 [uni-countdown]
-command=python -u ~/Uni/.scripts/newscript/countdown.py
+command=python -u ~/Uni/.scripts/countdown.py
 interval=60
 
 #[news]

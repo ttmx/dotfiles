@@ -3,7 +3,7 @@
 
 include "/home/tiago/.gtkrc-2.0.mine"
 gtk-theme-name="Nordic"
-gtk-icon-theme-name="Sweet-Purple"
+gtk-icon-theme-name="Papirus-Custom"
 gtk-font-name="Ubuntu 10"
 gtk-cursor-theme-name="capitaine-cursors-light"
 gtk-cursor-theme-size=0

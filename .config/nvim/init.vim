@@ -24,6 +24,10 @@ Plug 'kovetskiy/sxhkd-vim'
 Plug 'drewtempelmeyer/palenight.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'jackguo380/vim-lsp-cxx-highlight'
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'yarn install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
+Plug 'rkaminsk/vim-syntax-clingo'
 call plug#end()
 
 
@@ -111,7 +115,7 @@ set termguicolors
 " Run xrdb whenever Xdefaults or Xresources are updated.
 	autocmd BufWritePost *Xresources,*Xdefaults !xrdb %
 " Restart picom whenever compton conf is updated
-	autocmd BufWritePost *picom.conf !pkill picom; picom &
+	autocmd BufWritePost *picom.conf !pkill picom; picom -b
 
 
 " Navigating with guides

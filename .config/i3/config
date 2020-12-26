@@ -30,6 +30,13 @@ for_window [instance="dropdown_dropdowncalc"] resize set 800 300
 for_window [instance="dropdown_tmuxdd"] border pixel 3
 for_window [instance="dropdown_dropdowncalc"] border pixel 2
 for_window [instance="dropdown_*"] move position center
+for_window [instance="keepassxc"] scratchpad show
+for_window [instance="keepassxc"] floating enable
+for_window [instance="keepassxc"] move scratchpad
+for_window [instance="keepassxc"] sticky enable
+for_window [instance="keepassxc"] scratchpad show
+for_window [instance="keepassxc"] move position center
+for_window [instance="keepassxc"] resize set 800 300
 
 bar {
 	font pango:Ubuntu, Font Awesome 5 Free 10

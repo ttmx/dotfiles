@@ -1,7 +1,9 @@
 sw_volume: 100
 audio_device_state:1:pulse audio
 audio_device_state:1:toggle_visualizer
-state: stop
+state: pause
+current: 12
+time: 202.951000
 random: 0
 repeat: 0
 single: 0
@@ -10,4 +12,22 @@ crossfade: 0
 mixrampdb: 0.000000
 mixrampdelay: -1.000000
 playlist_begin
+0:porter robinson - shepherdess - s.h.e. (2016).wav
+1:OblivionFall/Welcome To The Cum Zone.flac
+2:OblivionFall/Heir To The Cum Throne.flac
+3:OblivionFall/Your Cum Wont Last.flac
+4:Angemi - Opus Interstellar.mp3
+5:Monstercat Uncaged Vol. 5/01 - Pegboard Nerds & Knife Party - Harpoon.flac
+6:Monstercat Uncaged Vol. 5/02 - Slander & Monstercat - Kneel Before Me (feat. Asking Alexandria).flac
+7:Monstercat Uncaged Vol. 5/13 - Muzzy - New Age (feat. Celldweller).flac
+8:Monstercat Uncaged Vol. 5/34 - Muzzy & Sullivan King - In The Night (feat. Sullivan King).flac
+9:OblivionFall/Welcome To The Cum Zone.flac
+10:OblivionFall/Heir To The Cum Throne.flac
+11:OblivionFall/Your Cum Wont Last.flac
+12:porter robinson - shepherdess - s.h.e. (2016).wav
+13:porter robinson - shepherdess - s.h.e. (2016).wav
+14:OblivionFall/Welcome To The Cum Zone.flac
+15:OblivionFall/Heir To The Cum Throne.flac
+16:OblivionFall/Your Cum Wont Last.flac
+17:porter robinson - shepherdess.mp3
 playlist_end

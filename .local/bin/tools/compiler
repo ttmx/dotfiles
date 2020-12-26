@@ -36,5 +36,6 @@ case "$file" in
 	*\.sent) setsid sent "$file" 2>/dev/null & ;;
 	*\.js) node "$file" ;;
 	*\.ml) ocamlopt "$base.mli" "$file" -o "$base" && rm "$base.cmx" "$base.o" && "$base" ;;
+	*\.lp) clingo "$base.lp" 0;;
 	*) sed 1q "$file" | grep "^#!/" | sed "s/^#!//" | xargs -r -I % "$file" ;;
 esac

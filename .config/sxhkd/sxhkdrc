@@ -6,11 +6,11 @@ super + shift + Return
 super + d
 	dmenu_run
 super + r
-	$TERMINAL -e $FILE
+	ddspawn $FILE
 super + e
 	$TERMINAL -e neomutt
-# super + m
-# 	$TERMINAL -e ncmpcpp
+super + m
+	$TERMINAL -e ncmpcpp
 super + n
 	$TERMINAL -e newsboat
 super + i
@@ -21,22 +21,20 @@ super + shift + a
 	$TERMINAL -e pulsemixer; pkill -RTMIN+10 i3blocks
 super + shift + c
 	camtoggle
-super + m
-	python ~/Uni/.scripts/rofi-courses.py
 super + shift + m
-	python ~/Uni/.scripts/newscript/openlink.py
+	python ~/Uni/.scripts/openlink.py
 super + shift + e
 	tutorialvids
-super + w
-	$BROWSER
 super + shift + w
 	$BROWSER
 super + shift + g
 	gimp
+super + p
+	ddgui keepassxc
 
 # Et cetera...
 super + period
-	dmenuunicode
+	rofimoji --copy-only
 super + Scroll_Lock
 	killall screenkey || screenkey
 super + Pause
@@ -56,13 +54,15 @@ XF86AudioMute
 XF86Audio{Raise,Lower}Volume
 	lmc {u,d} 5
 XF86AudioNext
-	lmc next
+	playerctl next
 XF86AudioPlay
-	lmc toggle
+	playerctl play-pause
+XF86AudioPause
+	playerctl play-pause
 XF86AudioPrev
-	lmc prev
+	playerctl previous
 XF86AudioStop
-	lmc toggle
+	playerctl play-pause
 XF86MonBrightnessDown
 	xbacklight -dec 10 & $(progbar $(($(xbacklight -get |cut -f1 -d".") - 10)))
 XF86MonBrightnessUp

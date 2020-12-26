@@ -78,6 +78,7 @@ autoload edit-command-line; zle -N edit-command-line
 [ -f "$HOME/.config/aliasrc" ] && source "$HOME/.config/aliasrc"
 
 # Load zsh-syntax-highlighting; should be last.
+source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh 2>/dev/null
 # source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 

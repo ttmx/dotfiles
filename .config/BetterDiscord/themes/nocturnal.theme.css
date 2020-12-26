@@ -1,5 +1,12 @@
-//META{"name":"Nocturnal","description":"A simple & clean dark theme for thoses who live at night, made to be easy on the eye","author":"Spectra#7698","version":"1.0","source":"https://github.com/codedotspectra/themes","website":"https://codedotspectra.github.io/me/"}*//{}
-/*
+/**
+ * @name Nocturnal
+ * @version 2.6.1
+ * @description A simple & clean dark theme for thoses who live at night, made to be easy on the eye.
+ * @author Spectra#7698
+ * @invite PZdnCVD
+ * @source https://github.com/codedotspectra/themes
+ * @website https://codedotspectra.me/
+ *//*
 ███╗   ██╗ ██████╗  ██████╗████████╗██╗   ██╗██████╗ ███╗   ██╗ █████╗ ██╗
 ████╗  ██║██╔═══██╗██╔════╝╚══██╔══╝██║   ██║██╔══██╗████╗  ██║██╔══██╗██║
 ██╔██╗ ██║██║   ██║██║        ██║   ██║   ██║██████╔╝██╔██╗ ██║███████║██║
@@ -19,8 +26,8 @@ This theme is meant to be used with the dark version of discord
 /* MiniThemes */
 @import url('https://codedotspectra.github.io/themes/core/hljs.css');
 @import url('https://codedotspectra.github.io/themes/core/settings-icons.css');
-@import url('https://gibbu.github.io/BetterDiscord-Themes/RadialStatus/base.css');
-@import url("https://codedotspectra.github.io/themes/core/badges.css");
+@import url('https://discordstyles.github.io/RadialStatus/base.css');
+@import url('https://codedotspectra.github.io/themes/core/badges.css');
 /* Fixes */
 @import url('https://xcruxiex.github.io/BBDThemes/Fixes/NocturnalFixes.css');
 /*#################################################################################################*/
