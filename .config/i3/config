@@ -90,8 +90,7 @@ bindsym $mod+shift+i		exec --no-startup-id i3resize up
 bindsym $mod+o			sticky toggle
 bindsym $mod+shift+o		exec --no-startup-id i3resize right
 
-bindsym $mod+a			exec --no-startup-id ddspawn insect -f mono:pixelsize=24
-
+bindsym $mod+a			exec --no-startup-id ddspawn qalc
 bindsym $mod+s			gaps inner current plus 5
 bindsym $mod+shift+s		gaps inner current minus 5
 

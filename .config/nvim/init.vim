@@ -1,4 +1,7 @@
 let mapleader =","
+if &shell =~# 'fish$'
+    set shell=sh
+endif
 
 if ! filereadable(expand('~/.config/nvim/autoload/plug.vim'))
 	echo "Downloading junegunn/vim-plug to manage plugins..."
@@ -27,7 +30,8 @@ Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
-Plug 'rkaminsk/vim-syntax-clingo'
+Plug 'rkaminsk/vim-syntax-clingo',
+Plug 'dag/vim-fish'
 call plug#end()
 
 

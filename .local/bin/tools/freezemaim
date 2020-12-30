@@ -1,0 +1,4 @@
+#!/bin/bash
+scrot -q 80 -f -s /tmp/ss.png &&
+xclip -selection clipboard -t image/png </tmp/ss.png
+rm /tmp/ss.png

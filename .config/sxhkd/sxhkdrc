@@ -53,16 +53,6 @@ XF86AudioMute
 	lmc mute
 XF86Audio{Raise,Lower}Volume
 	lmc {u,d} 5
-XF86AudioNext
-	playerctl next
-XF86AudioPlay
-	playerctl play-pause
-XF86AudioPause
-	playerctl play-pause
-XF86AudioPrev
-	playerctl previous
-XF86AudioStop
-	playerctl play-pause
 XF86MonBrightnessDown
 	xbacklight -dec 10 & $(progbar $(($(xbacklight -get |cut -f1 -d".") - 10)))
 XF86MonBrightnessUp
@@ -83,15 +73,18 @@ super + Delete
 	dmenurecord kill
 
 # Next song
-super + guillemotleft
-	playerctl next
+{XF86AudioNext,super + guillemotleft}
+	playerctl next -i chromium
 # Previous song
-super + apostrophe
-	playerctl previous
+{XF86AudioPrev,super + apostrophe}
+	playerctl previous -i chromium
 # Play/pause song
-super + plus
-	playerctl play-pause
-
+{XF86AudioStop, super + plus}
+	playerctl play-pause -i chromium
+XF86AudioPause
+	playerctl pause -i chromium
+XF86AudioPlay
+	playerctl play -i chromium
 
 # Function keys
 # Show readme
