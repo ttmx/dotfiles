@@ -1,9 +1,8 @@
 #!/bin/sh
-case "$(printf "a selected area\\ncurrent window\\nfull screen\\na selected area (copy)\\ncurrent window (copy)\\nfull screen (copy)" | rofi -dmenu -p "Screenshot which area?")" in
-	"a selected area") maim -s $SCREENSHOTS/pic-selected-"$(date '+%y%m%d-%H%M-%S').png" ;;
-	"current window") maim -u -i "$(xdotool getactivewindow)" $SCREENSHOTS/pic-window-"$(date '+%y%m%d-%H%M-%S').png" ;;
-	"full screen") sleep 0.1; maim $SCREENSHOTS/pic-full-"$(date '+%y%m%d-%H%M-%S').png" ;;
-	"a selected area (copy)") sleep 0.1; freezemaim;;
-	"current window (copy)") maim -i "$(xdotool getactivewindow)" | xclip -selection clipboard -t image/png ;;
-	"full screen (copy)") sleep 0.1; maim | xclip -selection clipboard -t image/png ;;
+case "$(printf " Full screen \\n Full screen\\n視 Window \\n視 Window\\n麗 Selected area" | rofi -dmenu -p "Screenshot" -theme screenshot -selected-row 1 -location 5 )" in
+	"麗 Selected area") maim -s $SCREENSHOTS/pic-selected-"$(date '+%y%m%d-%H%M-%S').png" ;;
+	"視 Window") maim -u -i "$(xdotool getactivewindow)" $SCREENSHOTS/pic-window-"$(date '+%y%m%d-%H%M-%S').png" ;;
+	" Full screen") sleep 0.1; maim $SCREENSHOTS/pic-full-"$(date '+%y%m%d-%H%M-%S').png" ;;
+	"視 Window ") maim -i "$(xdotool getactivewindow)" | xclip -selection clipboard -t image/png ;;
+	" Full screen ") sleep 0.05; maim | xclip -selection clipboard -t image/png ;;
 esac

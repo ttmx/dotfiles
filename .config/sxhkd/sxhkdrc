@@ -1,12 +1,12 @@
 # Basic binds
 super + Return
 	$TERMINAL
-super + shift + Return
-	samedir
+# super + shift + Return
+# 	samedir
 super + d
 	dmenu_run
-super + r
-	ddspawn $FILE
+# super + r
+# 	ddspawn $FILE
 super + e
 	$TERMINAL -e neomutt
 super + m
@@ -35,6 +35,8 @@ super + p
 # Et cetera...
 super + period
 	rofimoji --copy-only
+super + colon
+	dmenuunicode
 super + Scroll_Lock
 	killall screenkey || screenkey
 super + Pause

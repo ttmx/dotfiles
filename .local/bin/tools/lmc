@@ -39,7 +39,6 @@ i.e. \`lmc r\` for \`lmc restart\`.
 EOF
 esac
 
-blocks=wmctrl -m |grep "Name" |awk '{printf $2}'
-blocks+="blocks"
+blocks="$(wmctrl -m |grep "Name" |awk '{printf $2}')blocks"
 
 pkill -RTMIN+10 $blocks

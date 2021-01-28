@@ -11,52 +11,63 @@ case $BLOCK_BUTTON in
 - Text color reflects charge left" ;;
 esac
 
+wm=$(wmctrl -m |grep Name| awk '{print $2}')
 for battery in /sys/class/power_supply/BAT?
 do
-capacity=$(cat "$battery"/capacity) || exit
-status=$(cat "$battery"/status)
-wm=$(wmctrl -m |grep Name| awk '{print $2}')
-if [ "$wm" = "i3" ]; then
-	str="<span color='%s'>%s%s</span>\n"
-	if [ "$capacity" -ge 75 ]; then
-		color="#7ca075"
-	elif [ "$capacity" -ge 30 ]; then
-		color="#a5accd"
-	elif [ "$capacity" -ge 15 ]; then
-		color="#a0757c"
+	capacity=$(cat "$battery"/capacity) || exit
+	status=$(cat "$battery"/status)
+	if [ "$wm" = "i3" ]; then
+		str="<span color='%s'>%s%s</span>\n"
+		if [ "$capacity" -ge 75 ]; then
+			color="#7ca075"
+		elif [ "$capacity" -ge 30 ]; then
+			color="#a5accd"
+		elif [ "$capacity" -ge 15 ]; then
+			color="#a0757c"
+		else
+			color="#ff0000"
+		fi
+	elif [ "$wm" = "dwm" ]; then
+		str="%s%s%s\n"
+		if [ "$capacity" -ge 75 ]; then
+			color=""
+		elif [ "$capacity" -ge 30 ]; then
+			color=""
+		elif [ "$capacity" -ge 15 ]; then
+			color="	"
+		else
+			color=""
+		fi
 	else
-		color="#ff0000"
+		str="<fc=%s><fn=3>%s</fn>%s</fc>\n"
+		if [ "$capacity" -ge 75 ]; then
+			color="#7ca075"
+		elif [ "$capacity" -ge 30 ]; then
+			color="#a5accd"
+		elif [ "$capacity" -ge 15 ]; then
+			color="#a0757c"
+		else
+			color="#ff0000"
+		fi
 	fi
-else
-	str="%s%s%s\n"
+
+
 	if [ "$capacity" -ge 75 ]; then
-		color=""
-	elif [ "$capacity" -ge 30 ]; then
-		color=""
-	elif [ "$capacity" -ge 15 ]; then
-		color="	"
+		batsymb=""
+	elif [ "$capacity" -ge 50 ]; then
+		batsymb=""
+	elif [ "$capacity" -ge 25 ]; then
+		batsymb=""
+	elif [ "$capacity" -ge 6 ]; then
+		batsymb=""
 	else
-		color=""
+		batsymb=""
 	fi
-fi
 
+	#[ "$status" = "Charging" ] && color=""
+	[ "$status" = "Charging" ] && color="#7ca075"
 
-if [ "$capacity" -ge 75 ]; then
-	batsymb=""
-elif [ "$capacity" -ge 50 ]; then
-	batsymb=""
-elif [ "$capacity" -ge 25 ]; then
-	batsymb=""
-elif [ "$capacity" -ge 6 ]; then
-	batsymb=""
-else
-	batsymb=""
-fi
-
-#[ "$status" = "Charging" ] && color=""
-[ "$status" = "Charging" ] && color="#7ca075"
-
-printf "$str" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not charging/ /;s/Charging/ /;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
+	printf "$str" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not charging/ /;s/Charging/ /;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
 done
 
 

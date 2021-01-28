@@ -12,3 +12,4 @@ unclutter &		# Remove mouse when idle
 picom &		# compton for epic gamer effects
 dunst &			# dunst for notifications
 mpdupdate &
+# mpd-mpris &

@@ -1,6 +1,6 @@
 let mapleader =","
 if &shell =~# 'fish$'
-    set shell=sh
+    set shell=bash
 endif
 
 if ! filereadable(expand('~/.config/nvim/autoload/plug.vim'))

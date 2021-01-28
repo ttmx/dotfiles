@@ -37,6 +37,8 @@ image/x-portable-bitmap=sxiv.desktop
 image/x-portable-graymap=sxiv.desktop
 image/x-tga=sxiv.desktop
 image/x-xpixmap=sxiv.desktop
+x-scheme-handler/tg=userapp-Telegram Desktop-NQSAX0.desktop
+x-scheme-handler/msteams=teams.desktop
 
 [Added Associations]
 application/pdf=org.pwmt.zathura-pdf-mupdf.desktop;
@@ -65,6 +67,7 @@ image/x-portable-graymap=sxiv.desktop;
 image/x-tga=sxiv.desktop;
 image/x-xpixmap=sxiv.desktop;
 binary/octet-stream=nvim.desktop;
+x-scheme-handler/tg=userapp-Telegram Desktop-NQSAX0.desktop;
 
 [Removed Associations]
 image/png=flashplayer-standalone.desktop;

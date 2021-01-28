@@ -55,6 +55,7 @@ label=
 [cpu]
 interval=15
 label=
+#label=
 
 [volume]
 interval=once
