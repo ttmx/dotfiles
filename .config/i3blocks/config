@@ -10,10 +10,12 @@ signal=9
 [playerctl-base]
 instance=spotify
 interval=repeat
+color=#ff8b92
 
 [uni-countdown]
 command=python -u ~/Uni/.scripts/countdown.py
 interval=60
+color=#ffcb6b
 
 #[news]
 #label=📰
@@ -31,6 +33,7 @@ interval=60
 [torrent]
 interval=20
 signal=7
+color=#ffe585
 
 #[weather]
 #interval=18000
@@ -44,17 +47,21 @@ signal=7
 [memory]
 interval=30
 label=
+color=#c3e88d
 
 [nettraffic]
 interval=5
+color=#9cc4ff
 
 [cpu-usage]
 interval=5
 label=
+color=#c792ea
 
 [cpu]
 interval=15
 label=
+color=#f07178
 #label=
 
 [volume]
@@ -69,13 +76,14 @@ signal=10
 #interval=60
 #command=disk /home 🏠
 
-[battery]
-command=battery BAT0
-interval=5
-signal=11
 
 [internet]
 interval=10
+
+[battery]
+command=battery
+interval=5
+signal=11
 
 [currentdate]
 interval=30
