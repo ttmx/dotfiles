@@ -39,13 +39,13 @@ do
 			color=""
 		fi
 	else
-		str="<fc=%s><fn=3>%s</fn>%s</fc>\n"
+		str="<fc=%s,#242831:4><fn=3>%s</fn>%s</fc>\n"
 		if [ "$capacity" -ge 75 ]; then
-			color="#7ca075"
+			color="#8fbcbb"
 		elif [ "$capacity" -ge 30 ]; then
-			color="#a5accd"
+			color="#81a1c1"
 		elif [ "$capacity" -ge 15 ]; then
-			color="#a0757c"
+			color="#bf616a"
 		else
 			color="#ff0000"
 		fi

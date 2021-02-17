@@ -58,8 +58,8 @@ bar {
 }
 # class                 border  backgr. text    indicator child_border
 client.focused          #81A1C1 #81A1C1 #ffffff #2e9ef4   #81A1C1
-client.focused_inactive #333333 #5f676a #ffffff #484e50   #5f676a
-client.unfocused        #333333 #434C5E #888888 #292d2e   #434C5E
+client.focused_inactive #3b4252 #5f676a #ffffff #484e50   #5f676a
+client.unfocused        #3b4252 #434C5E #888888 #292d2e   #434C5E
 client.urgent           #2f343a #bf616a #ffffff #bf616a   #bf616a
 client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 # #---basic bindings---# #

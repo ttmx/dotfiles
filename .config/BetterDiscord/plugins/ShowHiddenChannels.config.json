@@ -9,11 +9,13 @@
 		"244230771232079873": true
 	},
 	"settings": {
+		"alwaysCollapse": false,
 		"showAnnouncement": true,
 		"showForNormal": true,
 		"showStore": true,
 		"showText": true,
 		"showVoice": true,
+		"showVoiceUsers": true,
 		"sortNative": false
 	}
 }

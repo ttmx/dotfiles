@@ -1,25 +1,44 @@
-Config { font = "xft:Ubuntu:pixelsize=13:antialias=true:hinting=true"
-       , additionalFonts = [ "xft:Mononoki Nerd Font:pixelsize=11:antialias=true:hinting=true"
-                           , "xft:Mononoki Nerd Font:pixelsize=16:antialias=true:hinting=true"
-                           , "xft:FontAwesome:pixelsize=13"
+Config { font = "xft:Ubuntu:pixelsize=15:antialias=true:hinting=true"
+       , additionalFonts = [ "xft:Mononoki Nerd Font:pixelsize=17:antialias=true:hinting=true"
+                           , "xft:Mononoki Nerd Font:pixelsize=19:antialias=true:hinting=true"
+                           , "xft:FontAwesome:pixelsize=15"
+                           , "xft:Mononoki Nerd Font:pixelsize=5" --space
+						   , "xft:Ubuntu:pixelsize=17:weight=bold:antialias=true:hinting=true"
                            ]
-       , bgColor = "#1b1e2b"
-       , fgColor = "#a6accd"
-       , position = Static { xpos = 0 , ypos = 0, width = 1920, height = 21 }
+       , bgColor = "#2e3440"
+       , fgColor = "#d8dee9"
+       , position = Static { xpos = 0 , ypos = 0, width = 1920, height = 30 }
        , lowerOnStart = True
+	   , border = BottomBM 0
+	   , borderColor = "#3b4252"
+	   , borderWidth = 2
+	   , textOffset = 20
+	   , textOffsets = [20,21,20,-1,21]
+	   , iconRoot = "/home/tiago/.config/xmobar/icons/"
+	   -- , textOffsets = [2]
        , commands = [ Run Weather "EGPF" ["-t","<station>: <tempC>C","-L","18","-H","25","--normal","#7ca075","--high","red","--low","#a5accd"] 36000
                     --, Run Network "wlp2s0" ["-L","100","-H","100000","--normal","#7ca075","--high","#a0757c"] 10
                     , Run Network "wlp2s0" ["-t", "<fn=1>\xf0aa</fn> <rx>kb  <fn=1>\xf0ab</fn> <tx>kb"] 20
-                    , Run Cpu ["-L","3","-H","50","--normal","#7ca075","--high","#a0757c"] 10
-                    , Run Memory ["-t","Mem: <usedratio>%"] 10
+                    , Run Cpu ["-L","0","-H","101","--normal","#b48ead,#242831:4","-t","<fn=1></fn> <total>%"] 10
+                    , Run Memory ["-t","<fn=2></fn> <usedratio>%"] 10
                     , Run Swap [] 10
                     , Run Com "uname" ["-s","-r"] "" 36000
 					, Run Com "battery" [] "" 60
-    		    	, Run Date "%Y %b %_d (%a) | %H:%M " "date" 10
+    		    	, Run Date "<fn=1></fn> %Y %b %_d (%a)" "date" 10
+    		    	, Run Date "<fn=1></fn> %H:%M" "time" 10
 					, Run Com "/home/tiago/.config/xmobar/trayer-padding-icon.sh" [] "trayerpad" 20
                     , Run UnsafeStdinReader
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " %UnsafeStdinReader%}{ %cpu% | %memory% | %battery% | %wlp2s0% | %date% |%trayerpad%"
+       -- , template = " <fc=#5e81ac>%UnsafeStdinReader%</fc>}{%cpu% | %memory% | %battery% | %wlp2s0% | %date% |%trayerpad%"
+       , template = "\
+	   \<fn=2><fc=#242831><fn=5><fc=#5e81ac,#242831:4>%UnsafeStdinReader%</fc></fn></fc></fn>}{\
+	   \<fn=2><fc=#242831><fn=0><fc=#88c0d0,#242831:4>%wlp2s0%</fc></fn></fc></fn> \
+	   \<fn=2><fc=#242831><fn=0><fc=#b48ead,#242831:4>%cpu%</fc></fn></fc></fn> \
+	   \<fn=2><fc=#242831><fn=0><fc=#a3be8c,#242831:4>%memory%</fc></fn></fc></fn> \
+	   \<fn=2><fc=#242831><fn=0>%battery%</fn></fc></fn> \
+	   \<fn=2><fc=#242831><fn=0><fc=#ebcb8b,#242831:4>%date%</fc></fn></fc></fn> \
+	   \<fn=2><fc=#242831><fn=0><fc=#d08770,#242831:4>%time%</fc></fn></fc></fn>\
+	   \%trayerpad%"
        }

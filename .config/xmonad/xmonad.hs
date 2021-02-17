@@ -13,9 +13,16 @@ import Data.Monoid
 import System.Exit
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
+import XMonad.Util.Cursor
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat)
+import XMonad.Layout.MultiToggle.Instances
+import XMonad.Layout.MultiToggle
+import XMonad.Layout.Renamed
+
 
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Spacing
@@ -57,11 +64,32 @@ myModMask       = mod4Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = ["1","2","3","4","5","6","7","8","9","10"]
+
+myWorkspaces    = ["<fn=1>\62057</fn>","2","3","4","5","6","7","8","<fn=1>\61884</fn>","<fn=1>\64366</fn>"]
+
+-- colors = [
+--     ["#2e3440", "#2e3440"],  # background
+--     ["#d8dee9", "#d8dee9"],  # foreground
+--     ["#3b4252", "#3b4252"],  # background lighter
+--     ["#bf616a", "#bf616a"],  # red
+--     ["#a3be8c", "#a3be8c"],  # green
+--     ["#ebcb8b", "#ebcb8b"],  # yellow
+--     ["#81a1c1", "#81a1c1"],  # blue
+--     ["#b48ead", "#b48ead"],  # magenta
+--     ["#88c0d0", "#88c0d0"],  # cyan
+--     ["#e5e9f0", "#e5e9f0"],  # white
+--     ["#4c566a", "#4c566a"],  # grey
+--     ["#d08770", "#d08770"],  # orange
+--     ["#8fbcbb", "#8fbcbb"],  # super cyan
+--     ["#5e81ac", "#5e81ac"],  # super blue
+--     ["#242831", "#242831"],  # super dark background
+-- ]
+
 
 -- Border colors for unfocused and focused windows, respectively.
 --
-myNormalBorderColor  = "#333333"
+myNormalBorderColor  = "#3b4252"
+-- myFocusedBorderColor = "#3b4252"
 myFocusedBorderColor = "#81A1C1"
 
 ------------------------------------------------------------------------
@@ -134,11 +162,13 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 
     , ((modm .|. shiftMask, xK_t     ), toggleWindowSpacingEnabled >> sendMessage ToggleGaps)
 
+    , ((modm , xK_f     ), doFullScreen)
+
     -- Quit xmonad
     , ((modm .|. shiftMask, xK_F2     ), io (exitWith ExitSuccess))
 
     -- Restart xmonad
-    , ((modm              , xK_F2     ), spawn "xmonad --recompile;pkill xmobar; xmonad --restart")
+    , ((modm              , xK_F2     ), spawn "xmonad --restart")
 
     -- Run xmessage with a summary of the default keybindings (useful for beginners)
     , ((modm .|. shiftMask, xK_F1 ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
@@ -193,7 +223,18 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = spacingRaw True (Border 0 0 0 0) True (Border 15 15 15 15) True . gaps [(U, 15), (R, 15), (L, 15), (D, 15)] .  smartBorders . avoidStruts  $ tiled ||| Mirror tiled ||| Full
+doFullScreen :: X ()
+doFullScreen = do
+  sendMessage $ Toggle NBFULL
+  doCollapse
+
+doCollapse :: X ()
+doCollapse = do
+  sendMessage ToggleStruts
+  toggleWindowSpacingEnabled
+  sendMessage ToggleGaps
+
+myLayout =  renamed [Chain [CutWordsLeft 1, Append "</action>" , Prepend "<action=`notify-send \"beep\"` button=1>"]] . avoidStruts . spacingRaw False (Border 0 0 0 0) True (Border 8 8 8 8) True . gaps [(U, 22), (R, 22), (L, 22), (D, 22)]  $ renamed [Replace "<icon=layout-monadtall.xbm/>"] tiled ||| renamed [Replace "<icon=layout-monadwide.xbm/>"] ( Mirror tiled ) ||| renamed [Replace "<icon=layout-full.xbm/>"] Full
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -258,7 +299,9 @@ myLogHook = return ()
 --
 -- By default, do nothing.
 myStartupHook = do
-          cleanupStatusBars >> spawnStatusBarAndRemember "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --transparent true --alpha 0 --tint 0x1b1e2b  --height 21 &"
+            cleanupStatusBars
+            spawnStatusBarAndRemember "trayer --edge top --align right --widthtype request --padding 5 --SetDockType true --SetPartialStrut true --expand true --transparent true --alpha 0 --tint 0x2e3440 --height 28 &"
+            setDefaultCursor xC_left_ptr
 
 
 ------------------------------------------------------------------------
@@ -269,14 +312,56 @@ myStartupHook = do
 -- main = do
   -- xmproc <- spawnPipe "xmobar -x 0"
   -- xmonad $ docks defaults
-main = xmonad
-   =<< statusBar "xmobar"
-                     def         -- Formatting settings for bar
-                     toggleStrutsKey  -- Key to toggle bar on/off
-                     defaults         -- Rest of the config
-  where
-    toggleStrutsKey :: XConfig Layout -> (KeyMask, KeySym)
-    toggleStrutsKey XConfig{ modMask } = (modMask, xK_b)
+main = do
+    xmproc <- spawnPipeWithNoEncoding "xmobar -x 0"
+
+       -- =<< statusBar "xmobar"
+                     -- def         -- Formatting settings for bar
+                     -- toggleStrutsKey  -- Key to toggle bar on/off
+                     -- defaults         -- Rest of the config
+      -- where
+        -- toggleStrutsKey :: XConfig Layout -> (KeyMask, KeySym)
+        -- toggleStrutsKey XConfig{ modMask } = (modMask, xK_b)
+    xmonad $ docks . ewmh $ def
+        {        -- Run xmonad commands from command line with "xmonadctl command". Commands include:
+        -- shrink, expand, next-layout, default-layout, restart-wm, xterm, kill, refresh, run,
+        -- focus-up, focus-down, swap-up, swap-down, swap-master, sink, quit-wm. You can run
+        -- "xmonadctl 0" to generate full list of commands written to ~/.xsession-errors.
+        -- To compile xmonadctl: ghc -dynamic xmonadctl.hs
+              -- simple stuff
+        terminal           = myTerminal,
+        focusFollowsMouse  = myFocusFollowsMouse,
+        clickJustFocuses   = myClickJustFocuses,
+        borderWidth        = myBorderWidth,
+        modMask            = myModMask,
+        workspaces         = myWorkspaces,
+        normalBorderColor  = myNormalBorderColor,
+        focusedBorderColor = myFocusedBorderColor,
+
+      -- key bindings
+        keys               = myKeys,
+        mouseBindings      = myMouseBindings,
+
+      -- hooks, layouts
+        layoutHook         = myLayout,
+        manageHook         = ( isFullscreen --> doFullFloat ) <+> myManageHook,
+        handleEventHook    = myEventHook,
+        startupHook        = myStartupHook,
+
+        logHook = myLogHook <+> dynamicLogWithPP xmobarPP
+                        { ppOutput = \x -> hPutStrLn xmproc x
+                        , ppCurrent = xmobarColor "#81a1c1" "#242831:4" . wrap "" "" -- Current workspace in xmobar
+                        , ppVisible = xmobarColor "#98be65" "#242831:4"                -- Visible but not current workspace
+                        , ppHidden = xmobarColor "#4a5469" "#242831:4" . wrap "" ""   -- Hidden workspaces in xmobar
+                        , ppTitle = xmobarColor "#d08770" "#242831:4" . wrap "<fn=1>\61642 " "</fn>". xmobarRaw . shorten 50    -- Title of active window in xmobar
+                        -- , ppSep =  "<fn></fn>"          -- Separators in xmobar
+						, ppLayout = xmobarColor "#88c0d0" "#242831:4"
+                        , ppSep =  xmobarColor "#242831" "" "<fn=2>\57524<fn=5> </fn>\57526</fn>"
+                        , ppUrgent = xmobarColor "#C45500" "#242831:4" . wrap "!" "!"  -- Urgent workspace
+                        , ppOrder  = \(ws:l:t:ex) -> [ws,l]++ex++[t]
+                        }
+        }
+
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will

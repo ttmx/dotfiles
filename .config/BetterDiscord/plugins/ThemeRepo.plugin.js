@@ -14,42 +14,53 @@ module.exports = (_ => {
 		"info": {
 			"name": "ThemeRepo",
 			"author": "DevilBro",
-			"version": "2.1.0",
+			"version": "2.1.3",
 			"description": "Allow you to preview all themes from the theme repo and download them on the fly"
 		},
 		"changeLog": {
 			"fixed": {
-				"BD Beta": "Fixed some issues with the beta"
+				"New Settings Order": "Fixed for new settings order"
 			}
 		}
 	};
+
 	return !window.BDFDB_Global || (!window.BDFDB_Global.loaded && !window.BDFDB_Global.started) ? class {
 		getName () {return config.info.name;}
 		getAuthor () {return config.info.author;}
 		getVersion () {return config.info.version;}
-		getDescription () {return config.info.description;}
+		getDescription () {return `The Library Plugin needed for ${config.info.name} is missing. Open the Plugin Settings to download it. \n\n${config.info.description}`;}
 		
-		load() {
-			if (!window.BDFDB_Global || !Array.isArray(window.BDFDB_Global.pluginQueue)) window.BDFDB_Global = Object.assign({}, window.BDFDB_Global, {pluginQueue:[]});
+		downloadLibrary () {
+			require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
+				if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
+				else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
+			});
+		}
+		
+		load () {
+			if (!window.BDFDB_Global || !Array.isArray(window.BDFDB_Global.pluginQueue)) window.BDFDB_Global = Object.assign({}, window.BDFDB_Global, {pluginQueue: []});
 			if (!window.BDFDB_Global.downloadModal) {
 				window.BDFDB_Global.downloadModal = true;
-				BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.info.name} is missing. Please click "Download Now" to install it.`, {
+				BdApi.showConfirmationModal("Library Missing", `The Library Plugin needed for ${config.info.name} is missing. Please click "Download Now" to install it.`, {
 					confirmText: "Download Now",
 					cancelText: "Cancel",
 					onCancel: _ => {delete window.BDFDB_Global.downloadModal;},
 					onConfirm: _ => {
 						delete window.BDFDB_Global.downloadModal;
-						require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-							if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => {});
-							else BdApi.alert("Error", "Could not download BDFDB library plugin, try again some time later.");
-						});
+						this.downloadLibrary();
 					}
 				});
 			}
 			if (!window.BDFDB_Global.pluginQueue.includes(config.info.name)) window.BDFDB_Global.pluginQueue.push(config.info.name);
 		}
-		start() {this.load();}
-		stop() {}
+		start () {this.load();}
+		stop () {}
+		getSettingsPanel () {
+			let template = document.createElement("template");
+			template.innerHTML = `<div style="color: var(--header-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${config.info.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
+			template.content.firstElementChild.querySelector("a").addEventListener("click", this.downloadLibrary);
+			return template.content.firstElementChild;
+		}
 	} : (([Plugin, BDFDB]) => {
 		const isBeta = !(window.BdApi && !Array.isArray(BdApi.settings));
 		var _this;
@@ -67,19 +78,19 @@ module.exports = (_ => {
 				colorClass: "GREEN",
 				backgroundColor: "STATUS_GREEN",
 				icon: "CHECKMARK",
-				text: "Updated"
+				text: "updated"
 			},
 			OUTDATED: {
 				colorClass: "RED",
 				backgroundColor: "STATUS_RED",
 				icon: "CLOSE",
-				text: "Outdated"
+				text: "outdated"
 			},
 			DOWNLOADABLE: {
 				colorClass: "BRAND",
-				backgroundColor: "BRAND",
+				backgroundColor: "var(--bdfdb-blurple)",
 				icon: "DOWNLOAD",
-				text: "Download"
+				text: "download"
 			}
 		};
 		const favStates = {
@@ -104,7 +115,7 @@ module.exports = (_ => {
 			DESC:			"descending"
 		};
 		
-		const themeRepoIcon = `<svg width="36" height="31" viewBox="20 0 400 332"><path d="M0.000 39.479 L 0.000 78.957 43.575 78.957 L 87.151 78.957 87.151 204.097 L 87.151 329.236 129.609 329.236 L 172.067 329.236 172.067 204.097 L 172.067 78.957 215.642 78.957 L 259.218 78.957 259.218 39.479 L 259.218 0.000 129.609 0.000 L 0.000 0.000 0.000 39.479" stroke="none" fill="#7289da" fill-rule="evenodd"></path><path d="M274.115 38.624 L 274.115 77.248 280.261 77.734 C 309.962 80.083,325.986 106.575,313.378 132.486 C 305.279 149.131,295.114 152.700,255.800 152.700 L 230.168 152.700 230.168 123.277 L 230.168 93.855 208.566 93.855 L 186.965 93.855 186.965 211.546 L 186.965 329.236 208.566 329.236 L 230.168 329.236 230.168 277.068 L 230.168 224.899 237.268 225.113 L 244.368 225.326 282.215 277.095 L 320.062 328.864 360.031 329.057 L 400.000 329.249 400.000 313.283 L 400.000 297.317 367.924 256.908 L 335.848 216.499 340.182 214.869 C 376.035 201.391,395.726 170.616,399.382 122.342 C 405.008 48.071,360.214 0.000,285.379 0.000 L 274.115 0.000 274.115 38.624" stroke="none" fill="#72767d" fill-rule="evenodd"></path></svg>`;
+		const themeRepoIcon = `<svg width="42" height="32" viewBox="0 0 42 32"><path fill="COLOR_1" d="M 0,0 V 7.671875 H 8.6211458 V 32 H 16.922769 V 7.672 l 8.621146,-1.25e-4 V 0 Z"/><path fill="COLOR_2" d="M 29.542969 0 L 29.542969 7.5488281 L 30.056641 7.5488281 C 35.246318 7.5488281 35.246318 14.869141 30.056641 14.869141 L 25.234375 14.869141 L 25.234375 11.671875 L 20.921875 11.671875 L 20.921875 32 L 25.234375 32 L 25.234375 21.830078 L 26.705078 21.830078 L 34.236328 32 L 42 32 L 42 28.931641 L 35.613281 21.017578 C 39.562947 19.797239 41.998047 16.452154 41.998047 10.53125 C 41.814341 3.0284252 36.625168 0 29.919922 0 L 29.542969 0 z"/></svg>`;
 		
 		const RepoListComponent = class ThemeList extends BdApi.React.Component {
 			componentDidMount() {
@@ -116,6 +127,7 @@ module.exports = (_ => {
 				}, 5000);
 			}
 			componentWillUnmount() {
+				list = null;
 				if (preview) {
 					BDFDB.WindowUtils.close(preview);
 					preview = null;
@@ -157,6 +169,7 @@ module.exports = (_ => {
 				preview = BDFDB.WindowUtils.open(this, "https://mwittrien.github.io/BetterDiscordAddons/Plugins/_res/DiscordPreview.html", {
 					alwaysOnTop: settings.keepOnTop,
 					showOnReady: true,
+					devTools: BDFDB.ListenerUtils.isPressed(16),
 					frame: false,
 					onLoad: _ => {
 						let titleBar = document.querySelector(BDFDB.dotCN.titlebar);
@@ -246,7 +259,7 @@ module.exports = (_ => {
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TextElement, {
 									className: BDFDB.disCN.margintop20,
 									style: {textAlign: "center"},
-									children: "Themes are still being fetched. Please wait a moment."
+									children: `${BDFDB.LanguageUtils.LibraryStringsFormat("loading", "Theme Repo")} - ${BDFDB.LanguageUtils.LibraryStrings.please_wait}`
 								})
 							]
 						}) : BDFDB.ReactUtils.forceStyle(BDFDB.ReactUtils.createElement("div", {
@@ -271,7 +284,7 @@ module.exports = (_ => {
 								label: "Choose a Generator Theme",
 								basis: "60%",
 								value: this.props.currentGenerator && this.props.currentGenerator.value || "-----",
-								options: [{value:"-----", label:"-----"}, nativeCSSvars && {value:"nativediscord", label:"Discord", native:true}].concat((generatorThemes).map(url => ({value:url, label:(loadedThemes[url] || {}).name || "-----"})).sort((x, y) => (x.label < y.label ? -1 : x.label > y.label ? 1 : 0))).filter(n => n),
+								options: [{value: "-----", label: "-----"}, nativeCSSvars && {value: "nativediscord", label: "Discord", native: true}].concat((generatorThemes).map(url => ({value: url, label: (loadedThemes[url] || {}).name || "-----"})).sort((x, y) => (x.label < y.label ? -1 : x.label > y.label ? 1 : 0))).filter(n => n),
 								searchable: true,
 								onChange: (value, instance) => {
 									if (loadedThemes[value.value] || value.native) {
@@ -351,7 +364,7 @@ module.exports = (_ => {
 												}
 											}
 											let varDescription = varStr.join("").replace(/\*\/|\/\*/g, "").replace(/:/g, ": ").replace(/: \//g, ":/").replace(/--/g, " --").replace(/\( --/g, "(--").trim();
-											this.props.generatorValues[varName] = {value:oldValue, oldValue};
+											this.props.generatorValues[varName] = {value: oldValue, oldValue};
 											inputRefs.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsItem, {
 												dividerBottom: vars[vars.length-1] != varStr,
 												type: "TextInput",
@@ -393,7 +406,7 @@ module.exports = (_ => {
 							!automaticLoading && BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex, {
 								className: BDFDB.disCN.marginbottom20,
 								children: BDFDB.ReactUtils.createElement("div", {
-									className: BDFDB.disCNS.titledefault + BDFDB.disCN.cursordefault,
+									className: BDFDB.disCNS.settingsrowtitle + BDFDB.disCNS.settingsrowtitledefault + BDFDB.disCN.cursordefault,
 									children: "To experience ThemeRepo in the best way. I would recommend you to enable BD intern reload function, that way all downloaded files are loaded into Discord without the need to reload."
 								})
 							}),
@@ -535,17 +548,17 @@ module.exports = (_ => {
 										else if (this.props.theme.url.indexOf("https://gist.githubusercontent.com/") == 0) {
 											gitUrl = this.props.theme.url.replace("//gist.githubusercontent", "//gist.github").split("/raw/")[0];
 										}
-										if (gitUrl) BDFDB.DiscordUtils.openLink(gitUrl, settings.useChromium);
+										if (gitUrl) BDFDB.DiscordUtils.openLink(gitUrl);
 									}
 								})
 							})
 						}),
-						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Switch, {
+						BDFDB.LibraryRequires.electron && BDFDB.LibraryRequires.electron.remote && BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Switch, {
 							value: list && list.props.currentTheme && list.props.currentTheme.url == this.props.theme.url,
 							onChange: (value, instance) => {
 								if (!list) return;
 								
-								if (list.props.currentTheme) for (let ins of BDFDB.ReactUtils.findOwner(this._reactInternalFiber.return, {name:"ThemeCard", all:true}).filter(ins => ins && ins.props && ins.props.theme && ins.props.theme.url == list.props.currentTheme.url)) BDFDB.ReactUtils.forceUpdate(ins);
+								if (list.props.currentTheme) for (let ins of BDFDB.ReactUtils.findOwner(BDFDB.ObjectUtils.get(this, `${BDFDB.ReactUtils.instanceKey}.return`), {name: "ThemeCard", all: true}).filter(ins => ins && ins.props && ins.props.theme && ins.props.theme.url == list.props.currentTheme.url)) BDFDB.ReactUtils.forceUpdate(ins);
 								
 								if (value) list.props.currentTheme = this.props.theme;
 								else delete list.props.currentTheme;
@@ -582,7 +595,7 @@ module.exports = (_ => {
 							else if (this.props.theme.url.indexOf("https://gist.githubusercontent.com/") == 0) {
 								gitUrl = this.props.theme.url.replace("//gist.githubusercontent", "//gist.github").split("/raw/")[0];
 							}
-							if (gitUrl) BDFDB.DiscordUtils.openLink(gitUrl, settings.useChromium);
+							if (gitUrl) BDFDB.DiscordUtils.openLink(gitUrl);
 						}
 					}],
 					buttons: isBeta ? [
@@ -606,10 +619,10 @@ module.exports = (_ => {
 							})
 						}),
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
-							text: buttonConfig.text,
+							text: BDFDB.LanguageUtils.LibraryStrings[buttonConfig.text],
 							children: BDFDB.ReactUtils.createElement("div", {
 								className: BDFDB.disCNS._repobutton + BDFDB.disCN._repocontrolsbutton,
-								style: {backgroundColor: BDFDB.DiscordConstants.Colors[buttonConfig.backgroundColor]},
+								style: {backgroundColor: BDFDB.DiscordConstants.Colors[buttonConfig.backgroundColor] || buttonConfig.backgroundColor},
 								onClick: _ => {
 									_this.downloadTheme(this.props.theme);
 									if (list && list.props.rnmStart) BDFDB.TimeUtils.timeout(_ => {
@@ -631,7 +644,7 @@ module.exports = (_ => {
 						this.props.theme.state != themeStates.DOWNLOADABLE && BDFDB.ReactUtils.createElement("div", {
 							className: BDFDB.disCN._repocontrolsbutton,
 							children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
-								text: "Delete Themefile",
+								text: BDFDB.LanguageUtils.LanguageStrings.DELETE,
 								children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
 									name: BDFDB.LibraryComponents.SvgIcon.Names.NOVA_TRASH,
 									className: BDFDB.disCN._repoicon,
@@ -647,8 +660,8 @@ module.exports = (_ => {
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Button, {
 							size: BDFDB.LibraryComponents.Button.Sizes.MIN,
 							color: BDFDB.LibraryComponents.Button.Colors[buttonConfig.colorClass],
-							style: {backgroundColor: BDFDB.DiscordConstants.Colors[buttonConfig.backgroundColor]},
-							children: buttonConfig.text,
+							style: {backgroundColor: BDFDB.DiscordConstants.Colors[buttonConfig.backgroundColor] || buttonConfig.backgroundColor},
+							children: BDFDB.LanguageUtils.LibraryStrings[buttonConfig.text],
 							onClick: (e, instance) => {
 								_this.downloadTheme(this.props.theme);
 								if (list && list.props.rnmStart) BDFDB.TimeUtils.timeout(_ => {
@@ -676,16 +689,21 @@ module.exports = (_ => {
 							className: BDFDB.disCN.marginbottom4,
 							align: BDFDB.LibraryComponents.Flex.Align.CENTER,
 							children: [
-								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.FormComponents.FormTitle, {
-									tag: BDFDB.LibraryComponents.FormComponents.FormTitle.Tags.H2,
-									className: BDFDB.disCN.marginreset,
-									children: `Theme Repo — ${loading.is ? 0 : this.props.amount || 0}/${loading.is ? 0 : Object.keys(loadedThemes).length}`
+								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex.Child, {
+									grow: 1,
+									shrink: 0,
+									children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.FormComponents.FormTitle, {
+										tag: BDFDB.LibraryComponents.FormComponents.FormTitle.Tags.H2,
+										className: BDFDB.disCN.marginreset,
+										children: `Theme Repo — ${loading.is ? 0 : this.props.amount || 0}/${loading.is ? 0 : Object.keys(loadedThemes).length}`
+									})
 								}),
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex.Child, {
 									children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SearchBar, {
 										autoFocus: true,
 										query: this.props.searchString,
 										onChange: (value, instance) => {
+											if (loading.is) return;
 											BDFDB.TimeUtils.clear(searchTimeout);
 											searchTimeout = BDFDB.TimeUtils.timeout(_ => {
 												this.props.searchString = list.props.searchString = value.replace(/[<|>]/g, "");
@@ -693,10 +711,20 @@ module.exports = (_ => {
 											}, 1000);
 										},
 										onClear: instance => {
+											if (loading.is) return;
 											this.props.searchString = list.props.searchString = "";
 											BDFDB.ReactUtils.forceUpdate(this, list);
 										}
 									})
+								}),
+								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Button, {
+									size: BDFDB.LibraryComponents.Button.Sizes.TINY,
+									children: BDFDB.LanguageUtils.LibraryStrings.check_for_updates,
+									onClick: _ => {
+										if (loading.is) return;
+										loading = {is: false, timeout: null, amount: 0};
+										_this.loadThemes();
+									}
 								})
 							]
 						}),
@@ -710,7 +738,7 @@ module.exports = (_ => {
 										itemClassName: BDFDB.disCN.tabbaritem,
 										type: BDFDB.LibraryComponents.TabBar.Types.TOP,
 										selectedItem: this.props.tab,
-										items: [{value:"Themes"}, {value:"Generator"}, {value:BDFDB.LanguageUtils.LanguageStrings.SETTINGS}],
+										items: [{value: "Themes"}, {value: "Generator"}, {value: BDFDB.LanguageUtils.LanguageStrings.SETTINGS}],
 										onItemSelect: (value, instance) => {
 											this.props.tab = list.props.tab = value;
 											BDFDB.ReactUtils.forceUpdate(list);
@@ -758,10 +786,10 @@ module.exports = (_ => {
 			}
 		};
 		return class ThemeRepo extends Plugin {
-			onLoad() {
+			onLoad () {
 				_this = this;
 				
-				loading = {is:false, timeout:null, amount:0};
+				loading = {is: false, timeout: null, amount: 0};
 				
 				cachedThemes = [];
 				grabbedThemes = [];
@@ -771,16 +799,15 @@ module.exports = (_ => {
 
 				this.defaults = {
 					settings: {
-						useChromium: 		{value:false,		description:"Use an inbuilt browser window instead of opening your default browser"},
-						keepOnTop: 			{value:false,		description:"Keep the preview window always on top"},
-						notifyOutdated:		{value:true, 		description:"Get a notification when one of your Themes is outdated"},
-						notifyNewentries:	{value:true, 		description:"Get a notification when there are new entries in the Repo"}
+						keepOnTop: 			{value: false,		description: "Keep the Preview Window always on top"},
+						notifyOutdated:		{value: true, 		description: "Get a Notification when one of your Themes is outdated"},
+						notifyNewentries:	{value: true, 		description: "Get a Notification when there are new Entries in the Repo"}
 					},
 					modalSettings: {
-						updated: 			{value:true,	modify:true,	description:"Show updated Themes",},
-						outdated:			{value:true, 	modify:true,	description:"Show outdated Themes"},
-						downloadable:		{value:true, 	modify:true,	description:"Show downloadable Themes"},
-						rnmStart:			{value:true, 	modify:false,	description:"Apply Theme after Download"}
+						updated: 			{value: true,	modify: true,	description: "Show updated Themes",},
+						outdated:			{value: true, 	modify: true,	description: "Show outdated Themes"},
+						downloadable:		{value: true, 	modify: true,	description: "Show downloadable Themes"},
+						rnmStart:			{value: true, 	modify: false,	description: "Apply Theme after Download"}
 					}
 				};
 				
@@ -794,7 +821,7 @@ module.exports = (_ => {
 				};
 			}
 			
-			onStart() {
+			onStart () {
 				this.forceUpdateAll();
 
 				this.loadThemes();
@@ -802,13 +829,13 @@ module.exports = (_ => {
 				updateInterval = BDFDB.TimeUtils.interval(_ => {this.checkForNewThemes();}, 1000*60*30);
 			}
 			
-			onStop() {
+			onStop () {
 				BDFDB.TimeUtils.clear(updateInterval);
 				BDFDB.TimeUtils.clear(loading.timeout);
 
 				this.forceUpdateAll();
 
-				BDFDB.DOMUtils.remove(".bd-themerepobutton", ".themerepo-notice", ".themerepo-loadingicon");
+				BDFDB.DOMUtils.remove(BDFDB.dotCN._themereponotice, BDFDB.dotCN._themerepoloadingicon);
 			}
 
 			getSettingsPanel (collapseStates = {}) {
@@ -856,11 +883,9 @@ module.exports = (_ => {
 								]
 							})
 						}),
-						customList.length ? BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsPanelInner, {
+						customList.length ? BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsPanelList, {
 							title: "Custom Theme List:",
 							className: BDFDB.disCNS.margintop8 + BDFDB.disCN.marginbottom20,
-							first: true,
-							last: true,
 							children: customList.map(url => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Card, {
 								children: url,
 								onRemove: _ => {
@@ -876,7 +901,7 @@ module.exports = (_ => {
 							color: BDFDB.LibraryComponents.Button.Colors.RED,
 							label: "Remove all custom added Themes",
 							onClick: _ => {
-								BDFDB.ModalUtils.confirm(this, "Are you sure you want to remove all added Themes from your own list", _ => {
+								BDFDB.ModalUtils.confirm(this, "Are you sure you want to remove all added Themes from your own List", _ => {
 									BDFDB.DataUtils.save([], this, "custom");
 									BDFDB.PluginUtils.refreshSettingsPanel(this, settingsPanel, collapseStates);
 								});
@@ -884,20 +909,6 @@ module.exports = (_ => {
 							children: BDFDB.LanguageUtils.LanguageStrings.REMOVE
 						})
 					].flat(10).filter(n => n)
-				}));
-				settingsItems.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.CollapseContainer, {
-					title: "Refetch All",
-					collapseStates: collapseStates,
-					children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsItem, {
-						type: "Button",
-						margin: 0,
-						label: "Force all Themes to be fetched again",
-						onClick: _ => {
-							loading = {is:false, timeout:null, amount:0};
-							this.loadThemes();
-						},
-						children: BDFDB.LanguageUtils.LanguageStrings.ERRORS_RELOAD
-					})
 				}));
 				
 				return settingsPanel = BDFDB.PluginUtils.createSettingsPanel(this, settingsItems);
@@ -937,13 +948,11 @@ module.exports = (_ => {
 			processSettingsView (e) {
 				if (BDFDB.ArrayUtils.is(e.instance.props.sections) && e.instance.props.sections[0] && e.instance.props.sections[0].label == BDFDB.LanguageUtils.LanguageStrings.USER_SETTINGS) {
 					e.instance.props.sections = e.instance.props.sections.filter(n => n.section != "themerepo");
-					let oldSettings = !e.instance.props.sections.find(n => n.section == "themes");
-					let isPRinjected = oldSettings && e.instance.props.sections.find(n => n.section == "pluginrepo");
-					let index = e.instance.props.sections.indexOf(e.instance.props.sections.find(oldSettings ? (isPRinjected ? n => n.section == "pluginrepo" : n => n.section == BDFDB.DiscordConstants.UserSettingsSections.DEVELOPER_OPTIONS) : n => n.section == BDFDB.DiscordConstants.UserSettingsSections.CHANGE_LOG || n.section == "changelog"));
+					let index = e.instance.props.sections.indexOf(e.instance.props.sections.find(n => n.section == "pluginrepo") || e.instance.props.sections.find(n => n.section == "themes") || e.instance.props.sections.find(n => n.section == BDFDB.DiscordConstants.UserSettingsSections.DEVELOPER_OPTIONS) || e.instance.props.sections.find(n => n.section == BDFDB.DiscordConstants.UserSettingsSections.HYPESQUAD_ONLINE));
 					if (index > -1) {
-						e.instance.props.sections.splice(oldSettings ? index + 1 : index - 1, 0, {
-							label: "Theme Repo",
+						e.instance.props.sections.splice(index + 1, 0, {
 							section: "themerepo",
+							label: "Theme Repo",
 							element: _ => {
 								let options = Object.assign({}, modalSettings);
 								options.updated = options.updated && !showOnlyOutdated;
@@ -960,7 +969,7 @@ module.exports = (_ => {
 								return BDFDB.ReactUtils.createElement(RepoListComponent, options);
 							}
 						});
-						if (oldSettings && !isPRinjected) e.instance.props.sections.splice(index + 1, 0, {section: "DIVIDER"});
+						if (!e.instance.props.sections.find(n => n.section == "plugins" || n.section == "pluginrepo")) e.instance.props.sections.splice(index + 1, 0, {section: "DIVIDER"});
 					}
 				}
 			}
@@ -1000,12 +1009,12 @@ module.exports = (_ => {
 			
 			generateTheme (fullCSS, generatorValues) {
 				if (!fullCSS || !BDFDB.ObjectUtils.is(generatorValues)) return "";
-				for (let inputId in generatorValues) if (generatorValues[inputId].value && generatorValues[inputId].value.trim() && generatorValues[inputId].value != generatorValues[inputId].oldValue) fullCSS = fullCSS.replace(new RegExp(`--${BDFDB.StringUtils.regEscape(inputId)}(\\s*):(\\s*)${BDFDB.StringUtils.regEscape(generatorValues[inputId].oldValue)}`,"g"),`--${inputId}$1:$2${generatorValues[inputId].value}`);
+				for (let inputId in generatorValues) if (generatorValues[inputId].value && generatorValues[inputId].value.trim() && generatorValues[inputId].value != generatorValues[inputId].oldValue) fullCSS = fullCSS.replace(new RegExp(`--${BDFDB.StringUtils.regEscape(inputId)}(\\s*):(\\s*)${BDFDB.StringUtils.regEscape(generatorValues[inputId].oldValue)}`,"g"),`--${inputId}$1: $2${generatorValues[inputId].value}`);
 				return fullCSS;
 			}
 
 			loadThemes () {
-				BDFDB.DOMUtils.remove(".themerepo-loadingicon");
+				BDFDB.DOMUtils.remove(BDFDB.dotCN._themerepoloadingicon);
 				let getThemeInfo, outdated = 0, newEntries = 0, i = 0;
 				let tags = ["name", "description", "author", "version"];
 				let newEntriesData = BDFDB.DataUtils.load(this, "newentriesdata");
@@ -1019,25 +1028,27 @@ module.exports = (_ => {
 						grabbedThemes = body.split("\n").filter(n => n);
 						foundThemes = grabbedThemes.concat(customList);
 
-						loading = {is:true, timeout:BDFDB.TimeUtils.timeout(_ => {
+						loading = {is: true, timeout: BDFDB.TimeUtils.timeout(_ => {
 							BDFDB.TimeUtils.clear(loading.timeout);
 							if (this.started) {
 								if (loading.is && loading.amount < 4) BDFDB.TimeUtils.timeout(_ => {this.loadThemes();}, 10000);
-								loading = {is: false, timeout:null, amount:loading.amount};
+								loading = {is: false, timeout: null, amount: loading.amount};
 							}
-						}, 1200000), amount:loading.amount+1};
+						}, 1200000), amount: loading.amount+1};
 					
-						let loadingIcon = BDFDB.DOMUtils.create(themeRepoIcon);
-						BDFDB.DOMUtils.addClass(loadingIcon, "themerepo-loadingicon");
+						let loadingIcon = BDFDB.DOMUtils.create(themeRepoIcon.replace(/COLOR_1/gi, "var(--bdfdb-blurple)").replace(/COLOR_2/gi, "#72767d"));
+						BDFDB.DOMUtils.addClass(loadingIcon, BDFDB.disCN._themerepoloadingicon);
 						loadingIcon.addEventListener("mouseenter", _ => {
 							BDFDB.TooltipUtils.create(loadingIcon, this.getLoadingTooltipText(), {
 								type: "left",
+								className: BDFDB.disCN._themerepoloadingtooltip,
 								delay: 500,
-								style: "max-width: unset;",
-								selector: "themerepo-loading-tooltip"
+								style: "max-width: unset;"
 							});
 						});
 						BDFDB.PluginUtils.addLoadingIcon(loadingIcon);
+						
+						BDFDB.ReactUtils.forceUpdate(list, header);
 
 						getThemeInfo(_ => {
 							if (!this.started) {
@@ -1045,60 +1056,67 @@ module.exports = (_ => {
 								return;
 							}
 							BDFDB.TimeUtils.clear(loading.timeout);
-							BDFDB.DOMUtils.remove(loadingIcon, ".themerepo-loadingicon");
-							loading = {is:false, timeout:null, amount:loading.amount};
+							BDFDB.DOMUtils.remove(loadingIcon, BDFDB.dotCN._themerepoloadingicon);
+							loading = {is: false, timeout: null, amount: loading.amount};
 							
 							BDFDB.LogUtils.log("Finished fetching Themes", this.name);
 							if (list) BDFDB.ReactUtils.forceUpdate(list);
 							
-							if ((settings.notifyOutdated || settings.notifyOutdated == undefined) && outdated > 0) {
-								let oldBarButton = document.querySelector(".themerepo-outdate-notice " + BDFDB.dotCN.noticedismiss);
-								if (oldBarButton) oldBarButton.click();
-								let bar = BDFDB.NotificationUtils.notice(`${outdated} of your Themes ${outdated == 1 ? "is" : "are"} outdated. Check:`, {
+							if (settings.notifyOutdated && outdated > 0) {
+								let notice = document.querySelector(BDFDB.dotCN._themerepooutdatednotice);
+								if (notice) notice.close();
+								BDFDB.NotificationUtils.notice(this.labels.notice_outdated_themes.replace("{{var0}}", outdated), {
 									type: "danger",
-									btn: "ThemeRepo",
-									selector: "themerepo-notice themerepo-outdate-notice",
-									customicon: themeRepoIcon.replace(/#7289da/gi, "#FFF").replace(/#72767d/gi, "#B9BBBE")
-								});
-								bar.querySelector(BDFDB.dotCN.noticebutton).addEventListener("click", _ => {
-									showOnlyOutdated = true;
-									BDFDB.LibraryModules.UserSettingsUtils.open("themerepo");
-									bar.querySelector(BDFDB.dotCN.noticedismiss).click();
+									className: BDFDB.disCNS._themereponotice + BDFDB.disCN._themerepooutdatednotice,
+									customIcon: themeRepoIcon.replace(/COLOR_[0-9]+/gi, "currentColor"),
+									buttons: [{
+										contents: BDFDB.LanguageUtils.LanguageStrings.OPEN,
+										close: true,
+										onClick: _ => {
+											showOnlyOutdated = true;
+											BDFDB.LibraryModules.UserSettingsUtils.open("themerepo");
+										}
+									}]
 								});
 							}
 							
 							if (settings.notifyNewEntries && newEntries > 0) {
-								let oldBarButton = document.querySelector(".themerepo-newentries-notice " + BDFDB.dotCN.noticedismiss);
-								if (oldBarButton) oldBarButton.click();
-								let single = newEntries == 1;
-								let bar = BDFDB.NotificationUtils.notice(`There ${single ? "is" : "are"} ${newEntries} new Theme${single ? "" : "s"} in the Repo. Check:`, {
+								let notice = document.querySelector(BDFDB.dotCN._themereponewentriesnotice);
+								if (notice) notice.close();
+								BDFDB.NotificationUtils.notice(this.labels.notice_new_themes.replace("{{var0}}", newEntries), {
 									type: "success",
-									btn: "ThemeRepo",
-									selector: "themerepo-notice themerepo-newentries-notice",
-									customicon: themeRepoIcon.replace(/#7289da/gi, "#FFF").replace(/#72767d/gi, "#B9BBBE")
-								});
-								bar.querySelector(BDFDB.dotCN.noticebutton).addEventListener("click", _ => {
-									forcedSort = "NEW";
-									forcedOrder = "ASC";
-									BDFDB.LibraryModules.UserSettingsUtils.open("themerepo");
-									bar.querySelector(BDFDB.dotCN.noticedismiss).click();
+									className: BDFDB.disCNS._themereponotice + BDFDB.disCN._themereponewentriesnotice,
+									customIcon: themeRepoIcon.replace(/COLOR_[0-9]+/gi, "currentColor"),
+									buttons: [{
+										contents: BDFDB.LanguageUtils.LanguageStrings.OPEN,
+										close: true,
+										onClick: _ => {
+											forcedSort = "NEW";
+											forcedOrder = "ASC";
+											BDFDB.LibraryModules.UserSettingsUtils.open("themerepo");
+										}
+									}]
 								});
 							}
 							
 							if (BDFDB.UserUtils.me.id == "278543574059057154") {
+								let notice = document.querySelector(BDFDB.dotCN._themerepofailnotice);
+								if (notice) notice.close();
 								let wrongUrls = [];
 								for (let url of foundThemes) if (url && !loadedThemes[url] && !wrongUrls.includes(url)) wrongUrls.push(url);
 								if (wrongUrls.length) {
-									let bar = BDFDB.NotificationUtils.notice(`ThemeRepo: ${wrongUrls.length} Theme${wrongUrls.length > 1 ? "s" : ""} could not be loaded.`, {
+									BDFDB.NotificationUtils.notice(this.labels.notice_failed_themes.replace("{{var0}}", wrongUrls.length), {
 										type: "danger",
-										btn: "List",
-										selector: "themerepo-notice themerepo-fail-notice",
-										customicon: themeRepoIcon.replace(/#7289da/gi, "#FFF").replace(/#72767d/gi, "#B9BBBE")
-									});
-									bar.querySelector(BDFDB.dotCN.noticebutton).addEventListener("click", e => {
-										let toast = BDFDB.NotificationUtils.toast(wrongUrls.join("\n"), {type: "error"});
-										toast.style.setProperty("overflow", "hidden");
-										for (let url of wrongUrls) console.log(url);
+										className: BDFDB.disCNS._themereponotice + BDFDB.disCN._themerepofailnotice,
+										customIcon: themeRepoIcon.replace(/COLOR_[0-9]+/gi, "currentColor"),
+										buttons: [{
+											contents: this.labels.list,
+											onClick: _ => {
+												let toast = BDFDB.NotificationUtils.toast(wrongUrls.join("\n"), {type: "danger"});
+												toast.style.setProperty("overflow", "hidden");
+												for (let url of wrongUrls) console.log(url);
+											}
+										}]
 									});
 								}
 							}
@@ -1135,18 +1153,18 @@ module.exports = (_ => {
 							if ((text.split("*//").length > 1 || text.indexOf("/**") == 0) && text.split("\n").length > 1) {
 								let hasMETAline = text.replace(/\s/g, "").indexOf("//META{");
 								if (hasMETAline < 20 && hasMETAline > -1) {
-									let searchtext = text.replace(/\s*:\s*/g, ":").replace(/\s*}\s*/g, "}");
+									let searchText = text.replace(/\s*:\s*/g, ":").replace(/\s*}\s*/g, "}");
 									for (let tag of tags) {
-										let result = searchtext.split('"' + tag + '":"');
+										let result = searchText.split('"' + tag + '":"');
 										result = result.length > 1 ? result[1].split('",')[0].split('"}')[0] : null;
 										result = result && tag != "version" ? result.charAt(0).toUpperCase() + result.slice(1) : result;
 										theme[tag] = result ? result.trim() : result;
 									}
 								}
 								else {
-									let searchtext = text.replace(/[\r\t| ]*\*\s*/g, "*");
+									let searchText = text.replace(/[\r\t| ]*\*\s*/g, "*");
 									for (let tag of tags) {
-										let result = searchtext.split('@' + tag + ' ');
+										let result = searchText.split('@' + tag + ' ');
 										result = result.length > 1 ? result[1].split('\n')[0] : null;
 										result = result && tag != "version" ? result.charAt(0).toUpperCase() + result.slice(1) : result;
 										theme[tag] = result ? result.trim() : result;
@@ -1171,7 +1189,7 @@ module.exports = (_ => {
 						}
 						i++;
 						
-						let loadingTooltip = document.querySelector(".themerepo-loading-tooltip");
+						let loadingTooltip = document.querySelector(BDFDB.dotCN._themerepoloadingtooltip);
 						if (loadingTooltip) loadingTooltip.update(this.getLoadingTooltipText());
 						
 						getThemeInfo(callback);
@@ -1180,13 +1198,13 @@ module.exports = (_ => {
 			}
 
 			getLoadingTooltipText () {
-				return `Loading ThemeRepo - [${Object.keys(loadedThemes).length}/${Object.keys(grabbedThemes).length}]`;
+				return BDFDB.LanguageUtils.LibraryStringsFormat("loading", `ThemeRepo - [${Object.keys(loadedThemes).length}/${Object.keys(grabbedThemes).length}]`);
 			}
 
 			checkForNewThemes () {
 				BDFDB.LibraryRequires.request("https://mwittrien.github.io/BetterDiscordAddons/Plugins/ThemeRepo/_res/ThemeList.txt", (error, response, result) => {
 					if (response && !BDFDB.equals(result.replace(/\t|\r/g, "").split("\n").filter(n => n), grabbedThemes)) {
-						loading = {is:false, timeout:null, amount:0};
+						loading = {is: false, timeout: null, amount: 0};
 						this.loadThemes();
 					}
 				});
@@ -1194,15 +1212,15 @@ module.exports = (_ => {
 
 			downloadTheme (data) {
 				BDFDB.LibraryRequires.request(data.url, (error, response, body) => {
-					if (error) BDFDB.NotificationUtils.toast(`Unable to download Theme "${data.name}".`, {type:"danger"});
+					if (error) BDFDB.NotificationUtils.toast(BDFDB.LanguageUtils.LibraryStringsFormat("download_fail", `Theme "${data.name}"`), {type: "danger"});
 					else this.createThemeFile(data.url.split("/").pop(), body);
 				});
 			}
 
 			createThemeFile (filename, content) {
 				BDFDB.LibraryRequires.fs.writeFile(BDFDB.LibraryRequires.path.join(BDFDB.BDUtils.getThemesFolder(), filename), content, (error) => {
-					if (error) BDFDB.NotificationUtils.toast(`Unable to save Theme "${filename}".`, {type:"danger"});
-					else BDFDB.NotificationUtils.toast(`Successfully saved Theme "${filename}".`, {type:"success"});
+					if (error) BDFDB.NotificationUtils.toast(BDFDB.LanguageUtils.LibraryStringsFormat("save_fail", `Theme "${filename}"`), {type: "danger"});
+					else BDFDB.NotificationUtils.toast(BDFDB.LanguageUtils.LibraryStringsFormat("save_success", `Theme "${filename}"`), {type: "success"});
 				});
 			}
 
@@ -1211,15 +1229,15 @@ module.exports = (_ => {
 					let id = data.name.replace(/^[^a-z]+|[^\w-]+/gi, "-");
 					BDFDB.DOMUtils.remove(`style#${id}`);
 					BDFDB.BDUtils.enableTheme(data.name, false);
-					BDFDB.LogUtils.log(`Applied Theme ${data.name}.`, this.name);
+					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_started", data.name), this.name);
 				}
 			}
 
 			deleteThemeFile (data) {
 				let filename = data.url.split("/").pop();
 				BDFDB.LibraryRequires.fs.unlink(BDFDB.LibraryRequires.path.join(BDFDB.BDUtils.getThemesFolder(), filename), (error) => {
-					if (error) BDFDB.NotificationUtils.toast(`Unable to delete Theme "${filename}".`, {type:"danger"});
-					else BDFDB.NotificationUtils.toast(`Successfully deleted Theme "${filename}".`);
+					if (error) BDFDB.NotificationUtils.toast(BDFDB.LanguageUtils.LibraryStringsFormat("delete_fail", `Theme "${filename}"`), {type: "danger"});
+					else BDFDB.NotificationUtils.toast(BDFDB.LanguageUtils.LibraryStringsFormat("delete_success", `Theme "${filename}"`));
 				});
 			}
 
@@ -1228,7 +1246,201 @@ module.exports = (_ => {
 					let id = data.name.replace(/^[^a-z]+|[^\w-]+/gi, "-");
 					BDFDB.DOMUtils.remove(`style#${id}`);
 					BDFDB.BDUtils.disableTheme(data.name, false);
-					BDFDB.LogUtils.log(`Removed Theme ${data.name}.`, this.name);
+					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_stopped", data.name), this.name);
+				}
+			}
+
+			setLabelsByLanguage () {
+				switch (BDFDB.LanguageUtils.getLanguage().id) {
+					case "bg":		// Bulgarian
+						return {
+							list:								"Списък",
+							notice_failed_themes:				"Някои Themes [{{var0}}] не можаха да бъдат заредени",
+							notice_new_themes:					"Новите Themes [{{var0}}] бяха добавени към ThemeRepo",
+							notice_outdated_themes:				"Някои Themes [{{var0}}] са остарели"
+						};
+					case "da":		// Danish
+						return {
+							list:								"Liste",
+							notice_failed_themes:				"Nogle Themes [{{var0}}] kunne ikke indlæses",
+							notice_new_themes:					"Nye Themes [{{var0}}] er blevet føjet til ThemeRepo",
+							notice_outdated_themes:				"Nogle Themes [{{var0}}] er forældede"
+						};
+					case "de":		// German
+						return {
+							list:								"Liste",
+							notice_failed_themes:				"Einige Themes [{{var0}}] konnten nicht geladen werden",
+							notice_new_themes:					"Neue Themes [{{var0}}] wurden zur ThemeRepo hinzugefügt",
+							notice_outdated_themes:				"Einige Themes [{{var0}}] sind veraltet"
+						};
+					case "el":		// Greek
+						return {
+							list:								"Λίστα",
+							notice_failed_themes:				"Δεν ήταν δυνατή η φόρτωση ορισμένων Themes [{{var0}}] ",
+							notice_new_themes:					"Προστέθηκαν νέα Themes [{{var0}}] στο ThemeRepo",
+							notice_outdated_themes:				"Ορισμένα Themes [{{var0}}] είναι παλιά"
+						};
+					case "es":		// Spanish
+						return {
+							list:								"Lista",
+							notice_failed_themes:				"Algunos Themes [{{var0}}] no se pudieron cargar",
+							notice_new_themes:					"Se han agregado nuevos Themes [{{var0}}] a ThemeRepo",
+							notice_outdated_themes:				"Algunas Themes [{{var0}}] están desactualizadas"
+						};
+					case "fi":		// Finnish
+						return {
+							list:								"Lista",
+							notice_failed_themes:				"Joitain kohdetta Themes [{{var0}}] ei voitu ladata",
+							notice_new_themes:					"Uusi Themes [{{var0}}] on lisätty ThemeRepo",
+							notice_outdated_themes:				"Jotkut Themes [{{var0}}] ovat vanhentuneita"
+						};
+					case "fr":		// French
+						return {
+							list:								"Liste",
+							notice_failed_themes:				"Certains Themes [{{var0}}] n'ont pas pu être chargés",
+							notice_new_themes:					"De nouveaux Themes [{{var0}}] ont été ajoutés à ThemeRepo",
+							notice_outdated_themes:				"Certains Themes [{{var0}}] sont obsolètes"
+						};
+					case "hr":		// Croatian
+						return {
+							list:								"Popis",
+							notice_failed_themes:				"Neke datoteke Themes [{{var0}}] nije moguće učitati",
+							notice_new_themes:					"Novi Themes [{{var0}}] dodani su u ThemeRepo",
+							notice_outdated_themes:				"Neki su Themes [{{var0}}] zastarjeli"
+						};
+					case "hu":		// Hungarian
+						return {
+							list:								"Lista",
+							notice_failed_themes:				"Néhány Themes [{{var0}}] nem sikerült betölteni",
+							notice_new_themes:					"Új Themes [{{var0}}] hozzáadva a következőhöz: ThemeRepo",
+							notice_outdated_themes:				"Néhány Themes [{{var0}}] elavult"
+						};
+					case "it":		// Italian
+						return {
+							list:								"Elenco",
+							notice_failed_themes:				"Impossibile caricare alcuni Themes [{{var0}}] ",
+							notice_new_themes:					"Il nuovo Themes [{{var0}}] è stato aggiunto a ThemeRepo",
+							notice_outdated_themes:				"Alcuni Themes [{{var0}}] non sono aggiornati"
+						};
+					case "ja":		// Japanese
+						return {
+							list:								"リスト",
+							notice_failed_themes:				"一部の Themes [{{var0}}] を読み込めませんでした",
+							notice_new_themes:					"新しい Themes [{{var0}}] が ThemeRepo に追加されました",
+							notice_outdated_themes:				"一部の Themes [{{var0}}] は古くなっています"
+						};
+					case "ko":		// Korean
+						return {
+							list:								"명부",
+							notice_failed_themes:				"일부 Themes [{{var0}}] 을 (를)로드 할 수 없습니다.",
+							notice_new_themes:					"새 Themes [{{var0}}] 이 ThemeRepo 에 추가되었습니다.",
+							notice_outdated_themes:				"일부 Themes [{{var0}}] 이 오래되었습니다."
+						};
+					case "lt":		// Lithuanian
+						return {
+							list:								"Sąrašas",
+							notice_failed_themes:				"Kai kurių Themes [{{var0}}] nepavyko įkelti",
+							notice_new_themes:					"Naujas Themes [{{var0}}] pridėtas prie ThemeRepo",
+							notice_outdated_themes:				"Kai kurie Themes [{{var0}}] yra pasenę"
+						};
+					case "nl":		// Dutch
+						return {
+							list:								"Lijst",
+							notice_failed_themes:				"Sommige Themes [{{var0}}] konden niet worden geladen",
+							notice_new_themes:					"Nieuwe Themes [{{var0}}] zijn toegevoegd aan de ThemeRepo",
+							notice_outdated_themes:				"Sommige Themes [{{var0}}] zijn verouderd"
+						};
+					case "no":		// Norwegian
+						return {
+							list:								"Liste",
+							notice_failed_themes:				"Noen Themes [{{var0}}] kunne ikke lastes inn",
+							notice_new_themes:					"Nye Themes [{{var0}}] er lagt til i ThemeRepo",
+							notice_outdated_themes:				"Noen Themes [{{var0}}] er utdaterte"
+						};
+					case "pl":		// Polish
+						return {
+							list:								"Lista",
+							notice_failed_themes:				"Nie można załadować niektórych Themes [{{var0}}] ",
+							notice_new_themes:					"Nowe Themes [{{var0}}] zostały dodane do ThemeRepo",
+							notice_outdated_themes:				"Niektóre Themes [{{var0}}] są nieaktualne"
+						};
+					case "pt-BR":	// Portuguese (Brazil)
+						return {
+							list:								"Lista",
+							notice_failed_themes:				"Algum Themes [{{var0}}] não pôde ser carregado",
+							notice_new_themes:					"Novo Themes [{{var0}}] foi adicionado ao ThemeRepo",
+							notice_outdated_themes:				"Alguns Themes [{{var0}}] estão desatualizados"
+						};
+					case "ro":		// Romanian
+						return {
+							list:								"Listă",
+							notice_failed_themes:				"Unele Themes [{{var0}}] nu au putut fi încărcate",
+							notice_new_themes:					"Themes [{{var0}}] nou au fost adăugate la ThemeRepo",
+							notice_outdated_themes:				"Unele Themes [{{var0}}] sunt învechite"
+						};
+					case "ru":		// Russian
+						return {
+							list:								"Список",
+							notice_failed_themes:				"Не удалось загрузить некоторые Themes [{{var0}}] ",
+							notice_new_themes:					"Новые Themes [{{var0}}] добавлены в ThemeRepo",
+							notice_outdated_themes:				"Некоторые Themes [{{var0}}] устарели"
+						};
+					case "sv":		// Swedish
+						return {
+							list:								"Lista",
+							notice_failed_themes:				"Vissa Themes [{{var0}}] kunde inte laddas",
+							notice_new_themes:					"Nya Themes [{{var0}}] har lagts till i ThemeRepo",
+							notice_outdated_themes:				"Vissa Themes [{{var0}}] är föråldrade"
+						};
+					case "th":		// Thai
+						return {
+							list:								"รายการ",
+							notice_failed_themes:				"ไม่สามารถโหลด Themes [{{var0}}] บางรายการได้",
+							notice_new_themes:					"เพิ่ม Themes [{{var0}}] ใหม่ใน ThemeRepo แล้ว",
+							notice_outdated_themes:				"Themes [{{var0}}] บางรายการล้าสมัย"
+						};
+					case "tr":		// Turkish
+						return {
+							list:								"Liste",
+							notice_failed_themes:				"Bazı Themes [{{var0}}] yüklenemedi",
+							notice_new_themes:					"Yeni Themes [{{var0}}], ThemeRepo 'ye eklendi",
+							notice_outdated_themes:				"Bazı Themes [{{var0}}] güncel değil"
+						};
+					case "uk":		// Ukrainian
+						return {
+							list:								"Список",
+							notice_failed_themes:				"Деякі Themes [{{var0}}] не вдалося завантажити",
+							notice_new_themes:					"Нові Themes [{{var0}}] були додані до ThemeRepo",
+							notice_outdated_themes:				"Деякі Themes [{{var0}}] застарілі"
+						};
+					case "vi":		// Vietnamese
+						return {
+							list:								"Danh sách",
+							notice_failed_themes:				"Không thể tải một số Themes [{{var0}}] ",
+							notice_new_themes:					"Themes [{{var0}}] mới đã được thêm vào ThemeRepo",
+							notice_outdated_themes:				"Một số Themes [{{var0}}] đã lỗi thời"
+						};
+					case "zh-CN":	// Chinese (China)
+						return {
+							list:								"清单",
+							notice_failed_themes:				"某些 Themes [{{var0}}] 无法加载",
+							notice_new_themes:					"新的 Themes [{{var0}}] 已添加到 ThemeRepo",
+							notice_outdated_themes:				"一些 Themes [{{var0}}] 已过时"
+						};
+					case "zh-TW":	// Chinese (Taiwan)
+						return {
+							list:								"清單",
+							notice_failed_themes:				"某些 Themes [{{var0}}] 無法加載",
+							notice_new_themes:					"新的 Themes [{{var0}}] 已添加到 ThemeRepo",
+							notice_outdated_themes:				"一些 Themes [{{var0}}] 已過時"
+						};
+					default:		// English
+						return {
+							list:								"List",
+							notice_failed_themes:				"Some Themes [{{var0}}] could not be loaded",
+							notice_new_themes:					"New Themes [{{var0}}] have been added to the ThemeRepo",
+							notice_outdated_themes:				"Some Themes [{{var0}}] are outdated"
+						};
 				}
 			}
 		};

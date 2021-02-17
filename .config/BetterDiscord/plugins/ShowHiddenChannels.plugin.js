@@ -6,6 +6,7 @@
  * @patreon https://www.patreon.com/MircoWittrien
  * @website https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/ShowHiddenChannels
  * @source https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ShowHiddenChannels/ShowHiddenChannels.plugin.js
+ * @updateUrl https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ShowHiddenChannels/ShowHiddenChannels.plugin.js
  */
 
 module.exports = (_ => {
@@ -13,44 +14,55 @@ module.exports = (_ => {
 		"info": {
 			"name": "ShowHiddenChannels",
 			"author": "DevilBro",
-			"version": "2.8.7",
+			"version": "2.9.3",
 			"description": "Display channels that are hidden from you by role restrictions"
 		},
 		"changeLog": {
-			"fixed": {
-				"New Channel List": "Fixed for new update"
+			"added": {
+				"Hide connected voice users": "You can now disable the option to show users who are in a hidden voice channel"
 			}
 		}
 	};
+
 	return !window.BDFDB_Global || (!window.BDFDB_Global.loaded && !window.BDFDB_Global.started) ? class {
 		getName () {return config.info.name;}
 		getAuthor () {return config.info.author;}
 		getVersion () {return config.info.version;}
-		getDescription () {return config.info.description;}
+		getDescription () {return `The Library Plugin needed for ${config.info.name} is missing. Open the Plugin Settings to download it. \n\n${config.info.description}`;}
 		
-		load() {
-			if (!window.BDFDB_Global || !Array.isArray(window.BDFDB_Global.pluginQueue)) window.BDFDB_Global = Object.assign({}, window.BDFDB_Global, {pluginQueue:[]});
+		downloadLibrary () {
+			require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
+				if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
+				else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
+			});
+		}
+		
+		load () {
+			if (!window.BDFDB_Global || !Array.isArray(window.BDFDB_Global.pluginQueue)) window.BDFDB_Global = Object.assign({}, window.BDFDB_Global, {pluginQueue: []});
 			if (!window.BDFDB_Global.downloadModal) {
 				window.BDFDB_Global.downloadModal = true;
-				BdApi.showConfirmationModal("Library Missing", `The library plugin needed for ${config.info.name} is missing. Please click "Download Now" to install it.`, {
+				BdApi.showConfirmationModal("Library Missing", `The Library Plugin needed for ${config.info.name} is missing. Please click "Download Now" to install it.`, {
 					confirmText: "Download Now",
 					cancelText: "Cancel",
 					onCancel: _ => {delete window.BDFDB_Global.downloadModal;},
 					onConfirm: _ => {
 						delete window.BDFDB_Global.downloadModal;
-						require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-							if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => {});
-							else BdApi.alert("Error", "Could not download BDFDB library plugin, try again some time later.");
-						});
+						this.downloadLibrary();
 					}
 				});
 			}
 			if (!window.BDFDB_Global.pluginQueue.includes(config.info.name)) window.BDFDB_Global.pluginQueue.push(config.info.name);
 		}
-		start() {this.load();}
-		stop() {}
+		start () {this.load();}
+		stop () {}
+		getSettingsPanel () {
+			let template = document.createElement("template");
+			template.innerHTML = `<div style="color: var(--header-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${config.info.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
+			template.content.firstElementChild.querySelector("a").addEventListener("click", this.downloadLibrary);
+			return template.content.firstElementChild;
+		}
 	} : (([Plugin, BDFDB]) => {
-		var blacklist = [], collapselist = [], hiddenCategory, overrideTypes = [];
+		var blackList = [], collapseList = [], hiddenCategory, lastGuildId, overrideTypes = [];
 		var hiddenChannelCache = {};
 		var settings = {};
 		
@@ -77,7 +89,7 @@ module.exports = (_ => {
 			DEFAULT: `M 11.44 0 c 4.07 0 8.07 1.87 8.07 6.35 c 0 4.13 -4.74 5.72 -5.75 7.21 c -0.76 1.11 -0.51 2.67 -2.61 2.67 c -1.37 0 -2.03 -1.11 -2.03 -2.13 c 0 -3.78 5.56 -4.64 5.56 -7.76 c 0 -1.72 -1.14 -2.73 -3.05 -2.73 c -4.07 0 -2.48 4.19 -5.56 4.19 c -1.11 0 -2.07 -0.67 -2.07 -1.94 C 4 2.76 7.56 0 11.44 0 z M 11.28 18.3 c 1.43 0 2.61 1.17 2.61 2.61 c 0 1.43 -1.18 2.61 -2.61 2.61 c -1.43 0 -2.61 -1.17 -2.61 -2.61 C 8.68 19.48 9.85 18.3 11.28 18.3 z`
 		};
 		
-		const userRowComponent = class UserRow extends BdApi.React.Component {
+		const UserRowComponent = class UserRow extends BdApi.React.Component {
 			componentDidMount() {
 				if (this.props.user.fetchable) {
 					this.props.user.fetchable = false;
@@ -89,11 +101,13 @@ module.exports = (_ => {
 			}
 			render() {
 				return BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ListRow, {
-					prefix: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.AvatarComponents.default, {
+					prefix: BDFDB.ReactUtils.createElement("div", {
 						className: BDFDB.disCN.listavatar,
-						src: BDFDB.UserUtils.getAvatar(this.props.user.id),
-						status: BDFDB.UserUtils.getStatus(this.props.user.id),
-						size: BDFDB.LibraryComponents.AvatarComponents.Sizes.SIZE_40
+						children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.AvatarComponents.default, {
+							src: BDFDB.UserUtils.getAvatar(this.props.user.id),
+							status: BDFDB.UserUtils.getStatus(this.props.user.id),
+							size: BDFDB.LibraryComponents.AvatarComponents.Sizes.SIZE_40
+						})
 					}),
 					label: [
 						BDFDB.ReactUtils.createElement("span", {
@@ -110,7 +124,7 @@ module.exports = (_ => {
 			}
 		};
 		
-		const roleRowComponent = class RoleRow extends BdApi.React.Component {
+		const RoleRowComponent = class RoleRow extends BdApi.React.Component {
 			render() {
 				return BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ListRow, {
 					prefix: BDFDB.ReactUtils.createElement("div", {
@@ -138,24 +152,27 @@ module.exports = (_ => {
 		};
 	
 		return class ShowHiddenChannels extends Plugin {
-			onLoad() {
+			onLoad () {
 				overrideTypes = Object.keys(BDFDB.DiscordConstants.PermissionOverrideType);
 				 
 				this.defaults = {
 					settings: {
-						sortNative:				{value:false, 	description:"Sort hidden Channels in the native Order"},
-						showText:				{value:true, 	description:"Show hidden Text Channels"},
-						showVoice:				{value:true, 	description:"Show hidden Voice Channels"},
-						showAnnouncement:		{value:true, 	description:"Show hidden Announcement Channels"},
-						showStore:				{value:true, 	description:"Show hidden Store Channels"},
-						showForNormal:			{value:true,	description:"Add Access-Overview ContextMenu Entry for non-hidden Channels"},
+						sortNative:				{value: false, 	description: "Sort hidden Channels in the native Order"},
+						showText:				{value: true, 	description: "Show hidden Text Channels"},
+						showVoice:				{value: true, 	description: "Show hidden Voice Channels"},
+						showAnnouncement:		{value: true, 	description: "Show hidden Announcement Channels"},
+						showStore:				{value: true, 	description: "Show hidden Store Channels"},
+						showVoiceUsers:			{value: true, 	description: "Show connected Users in hidden Voice Channels"},
+						alwaysCollapse:			{value: false, 	description: "Always collapse 'Hidden' Category after switching Servers"},
+						showForNormal:			{value: true,	description: "Add Access-Overview ContextMenu Entry for non-hidden Channels"}
 					}
 				};
 			
 				this.patchedModules = {
 					before: {
 						Channels: "render",
-						ChannelCategoryItem: "type"
+						ChannelCategoryItem: "type",
+						VoiceUsers: "render"
 					},
 					after: {
 						ChannelItem: "default"
@@ -171,12 +188,12 @@ module.exports = (_ => {
 				`;
 			}
 			
-			onStart() {
-				let loadedBlacklist = BDFDB.DataUtils.load(this, "blacklist");
-				this.saveBlacklist(!BDFDB.ArrayUtils.is(loadedBlacklist) ? [] : loadedBlacklist);
+			onStart () {
+				let loadedBlackList = BDFDB.DataUtils.load(this, "blacklist");
+				this.saveBlackList(!BDFDB.ArrayUtils.is(loadedBlackList) ? [] : loadedBlackList);
 				
-				let loadedCollapselist = BDFDB.DataUtils.load(this, "categorydata");
-				this.saveCollapselist(!BDFDB.ArrayUtils.is(loadedCollapselist) ? [] : loadedCollapselist);
+				let loadedCollapseList = BDFDB.DataUtils.load(this, "categorydata");
+				this.saveCollapseList(!BDFDB.ArrayUtils.is(loadedCollapseList) ? [] : loadedCollapseList);
 				
 				BDFDB.PatchUtils.patch(this, BDFDB.LibraryModules.UnreadChannelUtils, "hasUnread", {after: e => {
 					return e.returnValue && !this.isChannelHidden(e.methodArguments[0]);
@@ -187,36 +204,43 @@ module.exports = (_ => {
 				}});
 				
 				BDFDB.PatchUtils.patch(this, BDFDB.LibraryModules.CategoryCollapseStore, "isCollapsed", {after: e => {
-					if (e.methodArguments[0] && e.methodArguments[0].endsWith("hidden")) return collapselist.includes(e.methodArguments[0]);
+					if (e.methodArguments[0] && e.methodArguments[0].endsWith("hidden")) {
+						if (settings.alwaysCollapse && e.methodArguments[0] != lastGuildId && !collapseList.includes(e.methodArguments[0])) {
+							collapseList.push(e.methodArguments[0]);
+							this.saveCollapseList(BDFDB.ArrayUtils.removeCopies(collapseList));
+						}
+						lastGuildId = e.methodArguments[0];
+						return collapseList.includes(e.methodArguments[0]);
+					}
 				}});
 				
 				BDFDB.PatchUtils.patch(this, BDFDB.LibraryModules.CategoryCollapseUtils, "categoryCollapse", {before: e => {
 					if (e.methodArguments[0] && e.methodArguments[0].endsWith("hidden")) {
-						if (!collapselist.includes(e.methodArguments[0])) {
-							collapselist.push(e.methodArguments[0]);
-							this.saveCollapselist(BDFDB.ArrayUtils.removeCopies(collapselist));
+						if (!collapseList.includes(e.methodArguments[0])) {
+							collapseList.push(e.methodArguments[0]);
+							this.saveCollapseList(BDFDB.ArrayUtils.removeCopies(collapseList));
 						}
 					}
 				}});
 				
 				BDFDB.PatchUtils.patch(this, BDFDB.LibraryModules.CategoryCollapseUtils, "categoryExpand", {before: e => {
 					if (e.methodArguments[0] && e.methodArguments[0].endsWith("hidden")) {
-						if (collapselist.includes(e.methodArguments[0])) {
-							BDFDB.ArrayUtils.remove(collapselist, e.methodArguments[0], true);
-							this.saveCollapselist(BDFDB.ArrayUtils.removeCopies(collapselist));
+						if (collapseList.includes(e.methodArguments[0])) {
+							BDFDB.ArrayUtils.remove(collapseList, e.methodArguments[0], true);
+							this.saveCollapseList(BDFDB.ArrayUtils.removeCopies(collapseList));
 						}
 					}
 				}});
 				
 				BDFDB.PatchUtils.patch(this, BDFDB.LibraryModules.GuildChannelStore, "getTextChannelNameDisambiguations", {after: e => {
-					let all = BDFDB.LibraryModules.ChannelStore.getGuildChannels();
+					let all = this.getAllChannels();
 					for (let channel_id in all) if (all[channel_id].guild_id == e.methodArguments[0] && !e.returnValue[channel_id] && (all[channel_id].type != BDFDB.DiscordConstants.ChannelTypes.GUILD_CATEGORY && all[channel_id].type != BDFDB.DiscordConstants.ChannelTypes.GUILD_VOICE)) e.returnValue[channel_id] = {id: channel_id, name: all[channel_id].name};
 				}});
 
 				this.forceUpdateAll();
 			}
 			
-			onStop() {
+			onStop () {
 				this.forceUpdateAll();
 			}
 
@@ -241,9 +265,9 @@ module.exports = (_ => {
 					children: [
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsGuildList, {
 							className: BDFDB.disCN.marginbottom20,
-							disabled: blacklist,
+							disabled: blackList,
 							onClick: disabledGuilds => {
-								this.saveBlacklist(disabledGuilds);
+								this.saveBlackList(disabledGuilds);
 							}
 						}),
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsItem, {
@@ -312,13 +336,13 @@ module.exports = (_ => {
 				if (e.instance.props.guild) {
 					let [children, index] = BDFDB.ContextMenuUtils.findItem(e.returnvalue, {id: "hide-muted-channels"});
 					if (index > -1) children.splice(index + 1, 0, BDFDB.ContextMenuUtils.createItem(BDFDB.LibraryComponents.MenuItems.MenuCheckboxItem, {
-						label: this.labels.context_hidehidden_text,
+						label: this.labels.context_hidehidden,
 						id: BDFDB.ContextMenuUtils.createItemId(this.name, "hide-locked-channels"),
-						checked: blacklist.includes(e.instance.props.guild.id),
+						checked: blackList.includes(e.instance.props.guild.id),
 						action: value => {
-							if (value) blacklist.push(e.instance.props.guild.id);
-							else BDFDB.ArrayUtils.remove(blacklist, e.instance.props.guild.id, true);
-							this.saveBlacklist(BDFDB.ArrayUtils.removeCopies(blacklist));
+							if (value) blackList.push(e.instance.props.guild.id);
+							else BDFDB.ArrayUtils.remove(blackList, e.instance.props.guild.id, true);
+							this.saveBlackList(BDFDB.ArrayUtils.removeCopies(blackList));
 
 							BDFDB.PatchUtils.forceAllUpdates(this);
 							BDFDB.ChannelUtils.rerenderAll(true);
@@ -332,7 +356,7 @@ module.exports = (_ => {
 			}
 			
 			processChannels (e) {
-				if (!e.instance.props.guild || blacklist.includes(e.instance.props.guild.id)) return;
+				if (!e.instance.props.guild || blackList.includes(e.instance.props.guild.id)) return;
 				let [hiddenChannels, amount] = this.getHiddenChannels(e.instance.props.guild);
 				if (amount) {
 					e.instance.props.categories = Object.assign({}, e.instance.props.categories);
@@ -371,7 +395,7 @@ module.exports = (_ => {
 					else hiddenCategory = null;
 						
 					for (let type in hiddenChannels) {
-						let channelType = type == BDFDB.DiscordConstants.ChannelTypes.GUILD_TEXT && e.instance.props.channels.SELECTABLE ? "SELECTABLE" : type;
+						let channelType = type == BDFDB.DiscordConstants.ChannelTypes.GUILD && e.instance.props.channels.SELECTABLE ? "SELECTABLE" : type;
 						if (!BDFDB.ArrayUtils.is(e.instance.props.channels[channelType])) e.instance.props.channels[channelType] = [];
 						for (let channel of hiddenChannels[type]) {
 							let hiddenChannel = new BDFDB.DiscordObjects.Channel(Object.assign({}, channel, {
@@ -405,11 +429,13 @@ module.exports = (_ => {
 						nativeClass: true,
 						iconSVG: `<svg class="${BDFDB.disCN.channelicon}" width="24" height="24" viewBox="0 0 24 24"><mask id="${this.name + e.instance.props.channel.id}" fill="black"><path d="M 0 0 H 24 V 24 H 0 Z" fill="white"></path><path d="M24 0 H 13 V 12 H 24 Z" fill="black"></path></mask><path mask="url(#${this.name + e.instance.props.channel.id})" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="${this.channelIcons[BDFDB.DiscordConstants.ChannelTypes[e.instance.props.channel.type]] || this.channelIcons.DEFAULT}"></path><path fill="currentColor" d="M 21.025 5 V 4 C 21.025 2.88 20.05 2 19 2 C 17.95 2 17 2.88 17 4 V 5 C 16.4477 5 16 5.44772 16 6 V 9 C 16 9.55228 16.4477 10 17 10 H 19 H 21 C 21.5523 10 22 9.55228 22 9 V 5.975C22 5.43652 21.5635 5 21.025 5 Z M 20 5 H 18 V 4 C 18 3.42857 18.4667 3 19 3 C 19.5333 3 20 3.42857 20 4 V 5 Z"></path></svg>`
 					});
-					let channelChildren = BDFDB.ReactUtils.findChild(e.returnvalue, {props:[["className", BDFDB.disCN.channelchildren]]});
+					let channelChildren = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.channelchildren]]});
 					if (channelChildren && channelChildren.props && channelChildren.props.children) {
 						channelChildren.props.children = [BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
 							text: BDFDB.LanguageUtils.LanguageStrings.CHANNEL_LOCKED_SHORT,
 							children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Clickable, {
+								className: BDFDB.disCN.channeliconitem,
+								style: {display: "block"},
 								children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
 									className: BDFDB.disCN.channelactionicon,
 									name: BDFDB.LibraryComponents.SvgIcon.Names.LOCK_CLOSED
@@ -417,16 +443,23 @@ module.exports = (_ => {
 							})
 						})];
 					}
-					let wrapper = BDFDB.ReactUtils.findChild(e.returnvalue, {props:[["className", BDFDB.disCN.channelwrapper]]});
-					if (wrapper) {
-						wrapper.props.onMouseDown = _ => {};
-						wrapper.props.onMouseUp = _ => {};
-					}
-					let maincontent = BDFDB.ReactUtils.findChild(e.returnvalue, {props:[["className", BDFDB.disCN.channelmaincontent]]});
-					if (maincontent) {
-						maincontent.props.onClick = _ => {};
+					if (!(e.instance.props.channel.type == BDFDB.DiscordConstants.ChannelTypes.GUILD_VOICE && e.instance.props.connected)) {
+						let wrapper = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.channelwrapper]]});
+						if (wrapper) {
+							wrapper.props.onMouseDown = _ => {};
+							wrapper.props.onMouseUp = _ => {};
+						}
+						let mainContent = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.channelmaincontent]]});
+						if (mainContent) {
+							mainContent.props.onClick = _ => {};
+							mainContent.props.href = null;
+						}
 					}
 				}
+			}
+		
+			processVoiceUsers (e) {
+				if (!settings.showVoiceUsers && this.isChannelHidden(e.instance.props.channel.id)) e.instance.props.voiceStates = [];
 			}
 			
 			isChannelHidden (channelId) {
@@ -434,42 +467,44 @@ module.exports = (_ => {
 				return channel && hiddenChannelCache[channel.guild_id] && hiddenChannelCache[channel.guild_id].hidden[channel.type] && hiddenChannelCache[channel.guild_id].hidden[channel.type].find(c => c.id == channel.id);
 			}
 			
+			getAllChannels () {
+				return (BDFDB.LibraryModules.ChannelStore.getGuildChannels || BDFDB.LibraryModules.ChannelStore.getMutableGuildChannels || (_ => {return {};}))();
+			}
+			
 			getHiddenChannels (guild) {
 				if (!guild) return [{}, 0];
-				let roles = (BDFDB.LibraryModules.MemberStore.getMember(guild.id, BDFDB.UserUtils.me.id) || {roles:[]}).roles.length;
-				if (hiddenChannelCache[guild.id] && hiddenChannelCache[guild.id].roles == roles) return [hiddenChannelCache[guild.id].hidden, hiddenChannelCache[guild.id].amount];
-				else {
-					let all = BDFDB.LibraryModules.ChannelStore.getGuildChannels(), hidden = {}, amount = 0;
-					for (let type in BDFDB.DiscordConstants.ChannelTypes) hidden[BDFDB.DiscordConstants.ChannelTypes[type]] = [];
+				let hiddenChannels = {}, rolesAmount = (BDFDB.LibraryModules.MemberStore.getMember(guild.id, BDFDB.UserUtils.me.id) || {roles: []}).roles.length;
+				if (!hiddenChannelCache[guild.id] || hiddenChannelCache[guild.id].roles != rolesAmount) {
+					let all = this.getAllChannels();
+					for (let type in BDFDB.DiscordConstants.ChannelTypes) hiddenChannels[BDFDB.DiscordConstants.ChannelTypes[type]] = [];
 					for (let channel_id in all) {
 						let channel = all[channel_id];
-						if (channel.guild_id == guild.id && channel.type != BDFDB.DiscordConstants.ChannelTypes.GUILD_CATEGORY && (settings[settingsMap[BDFDB.DiscordConstants.ChannelTypes[channel.type]]] || settings[settingsMap[BDFDB.DiscordConstants.ChannelTypes[channel.type]]] === undefined) && !BDFDB.DMUtils.isDMChannel(channel.id) && !BDFDB.UserUtils.can("VIEW_CHANNEL", BDFDB.UserUtils.me.id, channel.id)) {
-							amount++;
-							hidden[channel.type].push(channel);
-						}
+						if (channel.guild_id == guild.id && channel.type != BDFDB.DiscordConstants.ChannelTypes.GUILD_CATEGORY && (settings[settingsMap[BDFDB.DiscordConstants.ChannelTypes[channel.type]]] || settings[settingsMap[BDFDB.DiscordConstants.ChannelTypes[channel.type]]] === undefined) && !BDFDB.DMUtils.isDMChannel(channel.id) && !BDFDB.UserUtils.can("VIEW_CHANNEL", BDFDB.UserUtils.me.id, channel.id)) hiddenChannels[channel.type].push(channel);
 					}
-					hiddenChannelCache[guild.id] = {hidden, amount, roles};
-					return [hidden, amount];
 				}
+				else hiddenChannels = hiddenChannelCache[guild.id].hidden;
+				for (let type in hiddenChannels) hiddenChannels[type] = hiddenChannels[type].filter(c => BDFDB.LibraryModules.ChannelStore.getChannel(c.id));
+				hiddenChannelCache[guild.id] = {hidden: hiddenChannels, amount: BDFDB.ObjectUtils.toArray(hiddenChannels).flat().length, roles: rolesAmount};
+				return [hiddenChannelCache[guild.id].hidden, hiddenChannelCache[guild.id].amount];
 			}
 			
 			batchSetGuilds (settingsPanel, collapseStates, value) {
 				if (!value) {
-					for (let id of BDFDB.LibraryModules.FolderStore.getFlattenedGuildIds()) blacklist.push(id);
-					this.saveBlacklist(BDFDB.ArrayUtils.removeCopies(blacklist));
+					for (let id of BDFDB.LibraryModules.FolderStore.getFlattenedGuildIds()) blackList.push(id);
+					this.saveBlackList(BDFDB.ArrayUtils.removeCopies(blackList));
 				}
-				else this.saveBlacklist([]);
+				else this.saveBlackList([]);
 				BDFDB.PluginUtils.refreshSettingsPanel(this, settingsPanel, collapseStates);
 			}
 			
-			saveBlacklist (savedBlacklist) {
-				blacklist = savedBlacklist;
-				BDFDB.DataUtils.save(savedBlacklist, this, "blacklist");
+			saveBlackList (savedBlackList) {
+				blackList = savedBlackList;
+				BDFDB.DataUtils.save(savedBlackList, this, "blacklist");
 			}
 			
-			saveCollapselist (savedCollapselist) {
-				collapselist = savedCollapselist;
-				BDFDB.DataUtils.save(savedCollapselist, this, "categorydata");
+			saveCollapseList (savedCollapseList) {
+				collapseList = savedCollapseList;
+				BDFDB.DataUtils.save(savedCollapseList, this, "categorydata");
 			}
 			
 			openAccessModal (channel, allowed) {
@@ -477,37 +512,47 @@ module.exports = (_ => {
 				let myMember = guild && BDFDB.LibraryModules.MemberStore.getMember(guild.id, BDFDB.UserUtils.me.id);
 				let category = BDFDB.LibraryModules.ChannelStore.getChannel(BDFDB.LibraryModules.ChannelStore.getChannel(channel.id).parent_id);
 				let lightTheme = BDFDB.DiscordUtils.getTheme() == BDFDB.disCN.themelight;
+				
+				let addUser = (id, users) => {
+					let user = BDFDB.LibraryModules.UserStore.getUser(id);
+					if (user) allowedUsers.push(Object.assign({}, user, BDFDB.LibraryModules.MemberStore.getMember(guild.id, id) || {}));
+					else users.push({id: id, username: `UserId: ${id}`, fetchable: true});
+				};
+				let checkPerm = permString => {
+					return ((permString | BDFDB.DiscordConstants.Permissions.VIEW_CHANNEL) == permString || (permString | BDFDB.DiscordConstants.Permissions.READ_MESSAGE_HISTORY) == permString || channel.type == BDFDB.DiscordConstants.ChannelTypes.GUILD_VOICE && (permString | BDFDB.DiscordConstants.Permissions.CONNECT) == permString);
+				};
+				
 				let allowedRoles = [], allowedUsers = [], deniedRoles = [], deniedUsers = [], everyoneDenied = false;
 				for (let id in channel.permissionOverwrites) {
-					if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.ROLE || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.ROLE) && (guild.roles[id] && guild.roles[id].name != "@everyone") && ((channel.permissionOverwrites[id].allow | BDFDB.DiscordConstants.Permissions.VIEW_CHANNEL) == channel.permissionOverwrites[id].allow || (channel.permissionOverwrites[id].allow | BDFDB.DiscordConstants.Permissions.CONNECT) == channel.permissionOverwrites[id].allow)) {
+					if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.ROLE || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.ROLE) && (guild.roles[id] && guild.roles[id].name != "@everyone") && checkPerm(channel.permissionOverwrites[id].allow)) {
 						allowedRoles.push(Object.assign({overwritten: myMember && myMember.roles.includes(id) && !allowed}, guild.roles[id]));
 					}
-					else if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER) && ((channel.permissionOverwrites[id].allow | BDFDB.DiscordConstants.Permissions.VIEW_CHANNEL) == channel.permissionOverwrites[id].allow || (channel.permissionOverwrites[id].allow | BDFDB.DiscordConstants.Permissions.CONNECT) == channel.permissionOverwrites[id].allow)) {
-						let user = BDFDB.LibraryModules.UserStore.getUser(id);
-						if (user) allowedUsers.push(Object.assign({}, user, BDFDB.LibraryModules.MemberStore.getMember(guild.id, id) || {}));
-						else allowedUsers.push({id: id, username: `UserId: ${id}`, fetchable: true});
+					else if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER) && checkPerm(channel.permissionOverwrites[id].allow)) {
+						addUser(id, allowedUsers);
 					}
-					if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.ROLE || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.ROLE) && ((channel.permissionOverwrites[id].deny | BDFDB.DiscordConstants.Permissions.VIEW_CHANNEL) == channel.permissionOverwrites[id].deny || (channel.permissionOverwrites[id].deny | BDFDB.DiscordConstants.Permissions.CONNECT) == channel.permissionOverwrites[id].deny)) {
+					if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.ROLE || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.ROLE) && checkPerm(channel.permissionOverwrites[id].deny)) {
 						deniedRoles.push(guild.roles[id]);
 						if (guild.roles[id] && guild.roles[id].name == "@everyone") everyoneDenied = true;
 					}
-					else if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER) && ((channel.permissionOverwrites[id].deny | BDFDB.DiscordConstants.Permissions.VIEW_CHANNEL) == channel.permissionOverwrites[id].deny || (channel.permissionOverwrites[id].deny | BDFDB.DiscordConstants.Permissions.CONNECT) == channel.permissionOverwrites[id].deny)) {
-						let user = BDFDB.LibraryModules.UserStore.getUser(id);
-						if (user) deniedUsers.push(Object.assign({}, user, BDFDB.LibraryModules.MemberStore.getMember(guild.id, id) || {}));
-						else deniedUsers.push({id: id, username: `UserId: ${id}`, fetchable: true});
+					else if ((channel.permissionOverwrites[id].type == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER || overrideTypes[channel.permissionOverwrites[id].type] == BDFDB.DiscordConstants.PermissionOverrideType.MEMBER) && checkPerm(channel.permissionOverwrites[id].den)) {
+						addUser(id, deniedUsers);
 					}
 				}
+				
+				if (![].concat(allowedUsers, deniedUsers).find(user => user.id == guild.ownerId)) addUser(guild.ownerId, allowedUsers);
+				for (let id in guild.roles) if ((guild.roles[id].permissions | BDFDB.DiscordConstants.Permissions.ADMINISTRATOR) == guild.roles[id].permissions && ![].concat(allowedRoles, deniedRoles).find(role => role.id == id)) allowedRoles.push(Object.assign({overwritten: myMember && myMember.roles.includes(id) && !allowed}, guild.roles[id]));
 				if (allowed && !everyoneDenied) allowedRoles.push({name: "@everyone"});
+				
 				let allowedElements = [], deniedElements = [];
-				for (let role of allowedRoles) allowedElements.push(BDFDB.ReactUtils.createElement(roleRowComponent, {role: role, guildId: guild.id, channelId: channel.id}));
-				for (let user of allowedUsers) allowedElements.push(BDFDB.ReactUtils.createElement(userRowComponent, {user: user, guildId: guild.id, channelId: channel.id}));
-				for (let role of deniedRoles) deniedElements.push(BDFDB.ReactUtils.createElement(roleRowComponent, {role: role, guildId: guild.id, channelId: channel.id}));
-				for (let user of deniedUsers) deniedElements.push(BDFDB.ReactUtils.createElement(userRowComponent, {user: user, guildId: guild.id, channelId: channel.id}));
+				for (let role of allowedRoles) allowedElements.push(BDFDB.ReactUtils.createElement(RoleRowComponent, {role: role, guildId: guild.id, channelId: channel.id}));
+				for (let user of allowedUsers) allowedElements.push(BDFDB.ReactUtils.createElement(UserRowComponent, {user: user, guildId: guild.id, channelId: channel.id}));
+				for (let role of deniedRoles) deniedElements.push(BDFDB.ReactUtils.createElement(RoleRowComponent, {role: role, guildId: guild.id, channelId: channel.id}));
+				for (let user of deniedUsers) deniedElements.push(BDFDB.ReactUtils.createElement(UserRowComponent, {user: user, guildId: guild.id, channelId: channel.id}));
 
 				BDFDB.ModalUtils.open(this, {
 					size: "MEDIUM",
 					header: BDFDB.LanguageUtils.LanguageStrings.CHANNEL + " " + BDFDB.LanguageUtils.LanguageStrings.ACCESSIBILITY,
-					subheader: "#" + channel.name,
+					subHeader: "#" + channel.name,
 					className: BDFDB.disCN._showhiddenchannelsaccessmodal,
 					contentClassName: BDFDB.disCN.listscroller,
 					children: [
@@ -544,7 +589,7 @@ module.exports = (_ => {
 								]).flat(10).filter(n => n)
 						}),
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
-							tab: this.labels.modal_allowed_text,
+							tab: this.labels.modal_allowed,
 							children: allowedElements.length ? allowedElements :
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.MessagesPopoutComponents.EmptyStateBottom, {
 									msg: BDFDB.LanguageUtils.LanguageStrings.AUTOCOMPLETE_NO_RESULTS_HEADER,
@@ -552,7 +597,7 @@ module.exports = (_ => {
 								})
 						}),
 						BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
-							tab: this.labels.modal_denied_text,
+							tab: this.labels.modal_denied,
 							children: deniedElements.length ? deniedElements :
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.MessagesPopoutComponents.EmptyStateBottom, {
 									msg: BDFDB.LanguageUtils.LanguageStrings.AUTOCOMPLETE_NO_RESULTS_HEADER,
@@ -565,131 +610,167 @@ module.exports = (_ => {
 
 			setLabelsByLanguage () {
 				switch (BDFDB.LanguageUtils.getLanguage().id) {
-					case "hr":		//croatian
+					case "bg":		// Bulgarian
 						return {
-							context_hidehidden_text:		"Sakrij skrivene kanale",
-							modal_allowed_text:				"Dopušteno",
-							modal_denied_text:				"Odbijen"
+							context_hidehidden:					"Скриване на заключените канали",
+							modal_allowed:						"Разрешено",
+							modal_denied:						"Отрича се"
 						};
-					case "da":		//danish
+					case "da":		// Danish
 						return {
-							context_hidehidden_text:		"Skjul låste kanaler",
-							modal_allowed_text:				"Odbijen",
-							modal_denied_text:				"Nægtet"
+							context_hidehidden:					"Skjul låste kanaler",
+							modal_allowed:						"Tilladt",
+							modal_denied:						"Nægtet"
 						};
-					case "de":		//german
+					case "de":		// German
 						return {
-							context_hidehidden_text:		"Versteckte Kanäle ausblenden",
-							modal_allowed_text:				"Erlaubt",
-							modal_denied_text:				"Verweigert"
+							context_hidehidden:					"Versteckte Kanäle ausblenden",
+							modal_allowed:						"Erlaubt",
+							modal_denied:						"Verweigert"
 						};
-					case "es":		//spanish
+					case "el":		// Greek
 						return {
-							context_hidehidden_text:		"Ocultar canales bloqueados",
-							modal_allowed_text:				"Permitido",
-							modal_denied_text:				"Negado"
+							context_hidehidden:					"Απόκρυψη κλειδωμένων καναλιών",
+							modal_allowed:						"Επιτρεπόμενο",
+							modal_denied:						"Απορρίφθηκε"
 						};
-					case "fr":		//french
+					case "es":		// Spanish
 						return {
-							context_hidehidden_text:		"Masquer les salons verrouillées",
-							modal_allowed_text:				"Permis",
-							modal_denied_text:				"Nié"
+							context_hidehidden:					"Ocultar canales bloqueados",
+							modal_allowed:						"Permitido",
+							modal_denied:						"Negado"
 						};
-					case "it":		//italian
+					case "fi":		// Finnish
 						return {
-							context_hidehidden_text:		"Nascondi canali bloccati",
-							modal_allowed_text:				"Permesso",
-							modal_denied_text:				"Negato"
+							context_hidehidden:					"Piilota lukitut kanavat",
+							modal_allowed:						"Sallittu",
+							modal_denied:						"Kielletty"
 						};
-					case "nl":		//dutch
+					case "fr":		// French
 						return {
-							context_hidehidden_text:		"Vergrendelde kanalen verbergen",
-							modal_allowed_text:				"Toegestaan",
-							modal_denied_text:				"Ontkend"
+							context_hidehidden:					"Masquer les chaînes verrouillées",
+							modal_allowed:						"Permis",
+							modal_denied:						"Refusé"
 						};
-					case "no":		//norwegian
+					case "hr":		// Croatian
 						return {
-							context_hidehidden_text:		"Skjul låste kanaler",
-							modal_allowed_text:				"Tillatt",
-							modal_denied_text:				"Benektet"
+							context_hidehidden:					"Sakrij zaključane kanale",
+							modal_allowed:						"Dopuštena",
+							modal_denied:						"Odbijen"
 						};
-					case "pl":		//polish
+					case "hu":		// Hungarian
 						return {
-							context_hidehidden_text:		"Ukryj zablokowane kanały",
-							modal_allowed_text:				"Dozwolony",
-							modal_denied_text:				"Odmówiono"
+							context_hidehidden:					"Zárt csatornák elrejtése",
+							modal_allowed:						"Megengedett",
+							modal_denied:						"Megtagadva"
 						};
-					case "pt-BR":	//portuguese (brazil)
+					case "it":		// Italian
 						return {
-							context_hidehidden_text:		"Ocultar canais bloqueados",
-							modal_allowed_text:				"Permitido",
-							modal_denied_text:				"Negado"
+							context_hidehidden:					"Nascondi canali bloccati",
+							modal_allowed:						"Consentito",
+							modal_denied:						"Negato"
 						};
-					case "fi":		//finnish
+					case "ja":		// Japanese
 						return {
-							context_hidehidden_text:		"Piilota lukitut kanavat",
-							modal_allowed_text:				"Sallittu",
-							modal_denied_text:				"Evätty"
+							context_hidehidden:					"ロックされたチャンネルを非表示にする",
+							modal_allowed:						"許可",
+							modal_denied:						"拒否されました"
 						};
-					case "sv":		//swedish
+					case "ko":		// Korean
 						return {
-							context_hidehidden_text:		"Dölj låsta kanaler",
-							modal_allowed_text:				"Tillåten",
-							modal_denied_text:				"Nekas"
+							context_hidehidden:					"잠긴 채널 숨기기",
+							modal_allowed:						"허용됨",
+							modal_denied:						"거부 됨"
 						};
-					case "tr":		//turkish
+					case "lt":		// Lithuanian
 						return {
-							context_hidehidden_text:		"Kilitli Kanalları Gizle",
-							modal_allowed_text:				"Izin",
-							modal_denied_text:				"Inkar"
+							context_hidehidden:					"Slėpti užrakintus kanalus",
+							modal_allowed:						"Leidžiama",
+							modal_denied:						"Paneigta"
 						};
-					case "cs":		//czech
+					case "nl":		// Dutch
 						return {
-							context_hidehidden_text:		"Skrýt uzamčené kanály",
-							modal_allowed_text:				"Povoleno",
-							modal_denied_text:				"Odepřeno"
+							context_hidehidden:					"Verberg vergrendelde kanalen",
+							modal_allowed:						"Toegestaan",
+							modal_denied:						"Geweigerd"
 						};
-					case "bg":		//bulgarian
+					case "no":		// Norwegian
 						return {
-							context_hidehidden_text:		"Скриване на заключени канали",
-							modal_allowed_text:				"Позволен",
-							modal_denied_text:				"Отказан"
+							context_hidehidden:					"Skjul låste kanaler",
+							modal_allowed:						"Tillatt",
+							modal_denied:						"Nektet"
 						};
-					case "ru":		//russian
+					case "pl":		// Polish
 						return {
-							context_hidehidden_text:		"Скрыть заблокированные каналы",
-							modal_allowed_text:				"Разрешается",
-							modal_denied_text:				"Отказано"
+							context_hidehidden:					"Ukryj zablokowane kanały",
+							modal_allowed:						"Dozwolony",
+							modal_denied:						"Odmówiono"
 						};
-					case "uk":		//ukrainian
+					case "pt-BR":	// Portuguese (Brazil)
 						return {
-							context_hidehidden_text:		"Сховати заблоковані канали",
-							modal_allowed_text:				"Дозволено",
-							modal_denied_text:				"Заперечували"
+							context_hidehidden:					"Ocultar canais bloqueados",
+							modal_allowed:						"Permitido",
+							modal_denied:						"Negado"
 						};
-					case "ja":		//japanese
+					case "ro":		// Romanian
 						return {
-							context_hidehidden_text:		"ロックされたチャンネルを隠す",
-							modal_allowed_text:				"許可された",
-							modal_denied_text:				"拒否されました"
+							context_hidehidden:					"Ascundeți canalele blocate",
+							modal_allowed:						"Permis",
+							modal_denied:						"Negat"
 						};
-					case "zh-TW":	//chinese (traditional)
+					case "ru":		// Russian
 						return {
-							context_hidehidden_text:		"隱藏鎖定的頻道",
-							modal_allowed_text:				"允許的",
-							modal_denied_text:				"被拒絕"
+							context_hidehidden:					"Скрыть заблокированные каналы",
+							modal_allowed:						"Разрешенный",
+							modal_denied:						"Отказано"
 						};
-					case "ko":		//korean
+					case "sv":		// Swedish
 						return {
-							context_hidehidden_text:		"잠긴 채널 숨기기",
-							modal_allowed_text:				"허용됨",
-							modal_denied_text:				"거부"
+							context_hidehidden:					"Dölj låsta kanaler",
+							modal_allowed:						"Tillåtet",
+							modal_denied:						"Förnekad"
 						};
-					default:		//default: english
+					case "th":		// Thai
 						return {
-							context_hidehidden_text:		"Hide Locked Channels",
-							modal_allowed_text:				"Permitted",
-							modal_denied_text:				"Denied"
+							context_hidehidden:					"ซ่อนช่องที่ถูกล็อก",
+							modal_allowed:						"ได้รับอนุญาต",
+							modal_denied:						"ถูกปฏิเสธ"
+						};
+					case "tr":		// Turkish
+						return {
+							context_hidehidden:					"Kilitli Kanalları Gizle",
+							modal_allowed:						"İzin veriliyor",
+							modal_denied:						"Reddedildi"
+						};
+					case "uk":		// Ukrainian
+						return {
+							context_hidehidden:					"Сховати заблоковані канали",
+							modal_allowed:						"Дозволено",
+							modal_denied:						"Заперечується"
+						};
+					case "vi":		// Vietnamese
+						return {
+							context_hidehidden:					"Ẩn các kênh đã khóa",
+							modal_allowed:						"Được phép",
+							modal_denied:						"Phủ định"
+						};
+					case "zh-CN":	// Chinese (China)
+						return {
+							context_hidehidden:					"隐藏锁定的频道",
+							modal_allowed:						"允许的",
+							modal_denied:						"被拒绝"
+						};
+					case "zh-TW":	// Chinese (Taiwan)
+						return {
+							context_hidehidden:					"隱藏鎖定的頻道",
+							modal_allowed:						"允許的",
+							modal_denied:						"被拒絕"
+						};
+					default:		// English
+						return {
+							context_hidehidden:					"Hide Locked Channels",
+							modal_allowed:						"Permitted",
+							modal_denied:						"Denied"
 						};
 				}
 			}

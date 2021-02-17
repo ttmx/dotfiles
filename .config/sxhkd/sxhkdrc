@@ -1,6 +1,6 @@
 # Basic binds
 super + Return
-	$TERMINAL
+	$TERMINAL --config-file ~/.config/xmonad/alacritty.yml
 # super + shift + Return
 # 	samedir
 super + d
