@@ -39,7 +39,7 @@ do
 			color=""
 		fi
 	else
-		str="<fc=%s,#242831:4><fn=3>%s</fn>%s</fc>\n"
+		str="<fc=%s,#242831:4><fn=1>%s</fn>%s</fc>\n"
 		if [ "$capacity" -ge 75 ]; then
 			color="#8fbcbb"
 		elif [ "$capacity" -ge 30 ]; then
@@ -67,7 +67,7 @@ do
 	#[ "$status" = "Charging" ] && color=""
 	[ "$status" = "Charging" ] && color="#7ca075"
 
-	printf "$str" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not charging/ /;s/Charging/ /;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
+	printf "$str" "$color" "$(echo "$status" | sed -e "s/,//;s/Discharging/$batsymb/;s/Not charging/ /;s/Charging//;s/Unknown/♻️/;s/Full//;s/ 0*/ /g;s/ :/ /g")" "$(echo "$capacity" | sed -e 's/$/%/')"
 done
 
 

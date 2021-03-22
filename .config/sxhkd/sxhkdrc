@@ -1,6 +1,6 @@
 # Basic binds
 super + Return
-	$TERMINAL --config-file ~/.config/xmonad/alacritty.yml
+	$TERMINAL # --config-file ~/.config/xmonad/alacritty.yml
 # super + shift + Return
 # 	samedir
 super + d
@@ -34,7 +34,7 @@ super + p
 
 # Et cetera...
 super + period
-	rofimoji --copy-only
+	rofimoji --action copy
 super + colon
 	dmenuunicode
 super + Scroll_Lock

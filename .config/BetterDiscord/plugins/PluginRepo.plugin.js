@@ -1,12 +1,15 @@
 /**
  * @name PluginRepo
+ * @author DevilBro
  * @authorId 278543574059057154
+ * @version 2.1.5
+ * @description Allow you to look at all plugins from the plugin repo and download them on the fly
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
  * @patreon https://www.patreon.com/MircoWittrien
- * @website https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/PluginRepo
- * @source https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/PluginRepo/PluginRepo.plugin.js
- * @updateUrl https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/PluginRepo/PluginRepo.plugin.js
+ * @website https://mwittrien.github.io/
+ * @source https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/PluginRepo/
+ * @updateUrl https://mwittrien.github.io/BetterDiscordAddons/Plugins/PluginRepo/PluginRepo.plugin.js
  */
 
 module.exports = (_ => {
@@ -14,8 +17,13 @@ module.exports = (_ => {
 		"info": {
 			"name": "PluginRepo",
 			"author": "DevilBro",
-			"version": "2.1.3",
+			"version": "2.1.5",
 			"description": "Allow you to look at all plugins from the plugin repo and download them on the fly"
+		},
+		"changeLog": {
+			"fixed": {
+				"Repo Header": "Repo Header gets added properly again"
+			}
 		}
 	};
 
@@ -27,8 +35,8 @@ module.exports = (_ => {
 		
 		downloadLibrary () {
 			require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-				if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
-				else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
+				if (!e && b && r.statusCode == 200) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
+				else BdApi.alert("Error", "Could not download BDFDB Library Plugin. Try again later or download it manually from GitHub: https://mwittrien.github.io/downloader/?library");
 			});
 		}
 		
@@ -220,7 +228,7 @@ module.exports = (_ => {
 								disabled: key == "rnmStart" && !automaticLoading,
 								value: this.props[key],
 								onChange: (value, instance) => {
-									this.props[key] = value;
+									this.props[key] = modalSettings[key] = value;
 									BDFDB.ReactUtils.forceUpdate(this);
 								}
 							}))
@@ -676,7 +684,7 @@ module.exports = (_ => {
 			}
 			
 			processStandardSidebarView (e) {
-				if (BDFDB.ObjectUtils.get(e, "instance.props.content.props.section") == "pluginrepo") {
+				if (e.instance.props.section == "pluginrepo") {
 					let content = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.settingswindowcontentregion]]});
 					if (content) content.props.className = BDFDB.DOMUtils.formatClassName(BDFDB.disCN._repolistwrapper, content.props.className);
 					let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {props: [["className", BDFDB.disCN.settingswindowcontentregionscroller]]});
@@ -748,7 +756,7 @@ module.exports = (_ => {
 										BDFDB.DOMUtils.remove(loadingIcon, BDFDB.dotCN._pluginrepoloadingicon);
 										loading = {is: false, timeout: null, amount: loading.amount};
 										
-										BDFDB.LogUtils.log("Finished fetching Plugins", this.name);
+										BDFDB.LogUtils.log("Finished fetching Plugins", this);
 										if (list) BDFDB.ReactUtils.forceUpdate(list);
 										
 										if (settings.notifyOutdated && outdated > 0) {
@@ -834,9 +842,11 @@ module.exports = (_ => {
 								/* code is minified -> add newlines */
 								bodyCopy = body.replace(/}/g, "}\n");
 							}
+							
 							let bodyWithoutSpecial = bodyCopy.replace(/\n|\r|\t/g, "").replace(/\n|\r|\t/g, "").replace(/\s{2,}/g, "");
-							let configReg = /(\.exports|config)\s*=\s*\{(.*?)\s*["'`]*info["'`]*\s*:\s*/i.exec(bodyWithoutSpecial);
+							let configFound = false, configReg = /(\.exports|config)\s*=\s*\{(.*?)\s*["'`]*info["'`]*\s*:\s*/i.exec(bodyWithoutSpecial);
 							if (configReg) {
+								configFound = true;
 								try {
 									bodyWithoutSpecial = bodyWithoutSpecial.substring(configReg.index).split(configReg[0])[1].split("};")[0].split("}},")[0].replace(/,([\]\}])/g, "$1");
 									try {extractConfigInfo(plugin, JSON.parse('{"info":' + bodyWithoutSpecial + '}'));}
@@ -853,13 +863,14 @@ module.exports = (_ => {
 										}
 										catch (err) {
 											try {extractConfigInfo(plugin, JSON.parse(('{"info":' + configString + '}').replace(/'/g, "\"")));}
-											catch (err) {}
+											catch (err) {configFound = false;}
 										}
 									}
 								}
-								catch (err) {}
+								catch (err) {configFound = false;}
 							}
-							else {
+							
+							if (!configFound) {
 								let hasMETAline = bodyCopy.replace(/\s/g, "").indexOf("//META{");
 								if (!(hasMETAline < 20 && hasMETAline > -1)) {
 									let searchText = bodyCopy.replace(/[\r\t| ]*\*\s*/g, "*");
@@ -1029,7 +1040,7 @@ module.exports = (_ => {
 			startPlugin (data) {
 				if (data.name && BDFDB.BDUtils.isPluginEnabled(data.name) == false) {
 					BDFDB.BDUtils.enablePlugin(data.name, false);
-					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_started", data.name), this.name);
+					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_started", data.name), this);
 				}
 			}
 
@@ -1044,7 +1055,7 @@ module.exports = (_ => {
 			stopPlugin (data) {
 				if (data.name && BDFDB.BDUtils.isPluginEnabled(data.name) == true) {
 					BDFDB.BDUtils.disablePlugin(data.name, false);
-					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_stopped", data.name), this.name);
+					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_stopped", data.name), this);
 				}
 			}
 

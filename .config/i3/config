@@ -38,24 +38,27 @@ for_window [instance="keepassxc"] scratchpad show
 for_window [instance="keepassxc"] move position center
 for_window [instance="keepassxc"] resize set 800 300
 
-bar {
-	font pango:Ubuntu, Font Awesome 5 Free 10
-	status_command i3blocks
-	position top
-	mode dock
-	modifier None
-	# tray_output none
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+exec_always --no-startup-id pkill picom;sleep 0.1; picom -b
 
-	colors {
-		background #1b1e2b
-		statusline #a6accd
-		#		         	border		background	text
-		focused_workspace	#363b56		#363b56		#ffffff
-		inactive_workspace	#1b1e2b		#1b1e2b		#757ca1
-		active_workspace	#1b1e2b		#1b1e2b		#757ca1
-		urgent_workspace   	#1b1e2b 	#bf616a 	#ffffff
-	}
-}
+#bar {
+#	font pango:Ubuntu, Font Awesome 5 Free 10
+#	status_command i3blocks
+#	position top
+#	mode dock
+#	modifier None
+#	# tray_output none
+
+#	colors {
+#		background #1b1e2b
+#		statusline #a6accd
+#		#		         	border		background	text
+#		focused_workspace	#363b56		#363b56		#ffffff
+#		inactive_workspace	#1b1e2b		#1b1e2b		#757ca1
+#		active_workspace	#1b1e2b		#1b1e2b		#757ca1
+#		urgent_workspace   	#1b1e2b 	#bf616a 	#ffffff
+#	}
+#}
 # class                 border  backgr. text    indicator child_border
 client.focused          #81A1C1 #81A1C1 #ffffff #2e9ef4   #81A1C1
 client.focused_inactive #3b4252 #5f676a #ffffff #484e50   #5f676a

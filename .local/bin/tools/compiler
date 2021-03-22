@@ -9,6 +9,7 @@
 file=$(readlink -f "$1")
 dir=$(dirname "$file")
 base="${file%.*}"
+basename="$(basename $base)"
 
 cd "$dir" || exit
 
@@ -37,6 +38,7 @@ case "$file" in
 	*\.go) go run "$file" ;;
 	*\.sent) setsid sent "$file" 2>/dev/null & ;;
 	*\.js) node "$file" ;;
+	*\.java) javac "$file"&& java "$basename" ;;
 	*\.ml) ocamlopt "$base.mli" "$file" -o "$base" && rm "$base.cmx" "$base.o" && "$base" ;;
 	*\.lp) clingo "$base.lp" 0;;
 	*) sed 1q "$file" | grep "^#!/" | sed "s/^#!//" | xargs -r -I % "$file" ;;

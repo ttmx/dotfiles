@@ -1,12 +1,15 @@
 /**
  * @name ThemeRepo
+ * @author DevilBro
  * @authorId 278543574059057154
+ * @version 2.1.5
+ * @description Allow you to preview all themes from the theme repo and download them on the fly
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
  * @patreon https://www.patreon.com/MircoWittrien
- * @website https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/ThemeRepo
- * @source https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ThemeRepo/ThemeRepo.plugin.js
- * @updateUrl https://raw.githubusercontent.com/mwittrien/BetterDiscordAddons/master/Plugins/ThemeRepo/ThemeRepo.plugin.js
+ * @website https://mwittrien.github.io/
+ * @source https://github.com/mwittrien/BetterDiscordAddons/tree/master/Plugins/ThemeRepo/
+ * @updateUrl https://mwittrien.github.io/BetterDiscordAddons/Plugins/ThemeRepo/ThemeRepo.plugin.js
  */
 
 module.exports = (_ => {
@@ -14,12 +17,12 @@ module.exports = (_ => {
 		"info": {
 			"name": "ThemeRepo",
 			"author": "DevilBro",
-			"version": "2.1.3",
+			"version": "2.1.5",
 			"description": "Allow you to preview all themes from the theme repo and download them on the fly"
 		},
 		"changeLog": {
 			"fixed": {
-				"New Settings Order": "Fixed for new settings order"
+				"Repo Header": "Repo Header gets added properly again"
 			}
 		}
 	};
@@ -32,8 +35,8 @@ module.exports = (_ => {
 		
 		downloadLibrary () {
 			require("request").get("https://mwittrien.github.io/BetterDiscordAddons/Library/0BDFDB.plugin.js", (e, r, b) => {
-				if (!e && b && b.indexOf(`* @name BDFDB`) > -1) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
-				else BdApi.alert("Error", "Could not download BDFDB Library Plugin, try again later or download it manually from GitHub: https://github.com/mwittrien/BetterDiscordAddons/tree/master/Library/");
+				if (!e && b && r.statusCode == 200) require("fs").writeFile(require("path").join(BdApi.Plugins.folder, "0BDFDB.plugin.js"), b, _ => BdApi.showToast("Finished downloading BDFDB Library", {type: "success"}));
+				else BdApi.alert("Error", "Could not download BDFDB Library Plugin. Try again later or download it manually from GitHub: https://mwittrien.github.io/downloader/?library");
 			});
 		}
 		
@@ -492,7 +495,7 @@ module.exports = (_ => {
 								disabled: key == "rnmStart" && !automaticLoading,
 								value: this.props[key],
 								onChange: (value, instance) => {
-									this.props[key] = value;
+									this.props[key] = modalSettings[key] = value;
 									BDFDB.ReactUtils.forceUpdate(this);
 								}
 							}))
@@ -975,7 +978,7 @@ module.exports = (_ => {
 			}
 			
 			processStandardSidebarView (e) {
-				if (BDFDB.ObjectUtils.get(e, "instance.props.content.props.section") == "themerepo") {
+				if (e.instance.props.section == "themerepo") {
 					let content = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.settingswindowcontentregion]]});
 					if (content) content.props.className = BDFDB.DOMUtils.formatClassName(BDFDB.disCN._repolistwrapper, content.props.className);
 					let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {props: [["className", BDFDB.disCN.settingswindowcontentregionscroller]]});
@@ -1059,7 +1062,7 @@ module.exports = (_ => {
 							BDFDB.DOMUtils.remove(loadingIcon, BDFDB.dotCN._themerepoloadingicon);
 							loading = {is: false, timeout: null, amount: loading.amount};
 							
-							BDFDB.LogUtils.log("Finished fetching Themes", this.name);
+							BDFDB.LogUtils.log("Finished fetching Themes", this);
 							if (list) BDFDB.ReactUtils.forceUpdate(list);
 							
 							if (settings.notifyOutdated && outdated > 0) {
@@ -1229,7 +1232,7 @@ module.exports = (_ => {
 					let id = data.name.replace(/^[^a-z]+|[^\w-]+/gi, "-");
 					BDFDB.DOMUtils.remove(`style#${id}`);
 					BDFDB.BDUtils.enableTheme(data.name, false);
-					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_started", data.name), this.name);
+					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_started", data.name), this);
 				}
 			}
 
@@ -1246,7 +1249,7 @@ module.exports = (_ => {
 					let id = data.name.replace(/^[^a-z]+|[^\w-]+/gi, "-");
 					BDFDB.DOMUtils.remove(`style#${id}`);
 					BDFDB.BDUtils.disableTheme(data.name, false);
-					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_stopped", data.name), this.name);
+					BDFDB.LogUtils.log(BDFDB.LanguageUtils.LibraryStringsFormat("toast_plugin_stopped", data.name), this);
 				}
 			}
 

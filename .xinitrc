@@ -2,4 +2,4 @@
 
 [ -f "$HOME/.xprofile" ] && . ~/.xprofile
 
-exec xmonad
+exec i3

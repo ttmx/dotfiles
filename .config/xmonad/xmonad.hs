@@ -14,6 +14,8 @@ import System.Exit
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
 import XMonad.Util.Cursor
+import XMonad.Util.Scratchpad
+
 
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
@@ -23,10 +25,10 @@ import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.Renamed
 
-
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Spacing
 import XMonad.Layout.Gaps
+import XMonad.Layout.Fullscreen
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -106,6 +108,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "gmrun")
 
+    , ((modm , xK_r     ), scratchpadSpawnActionCustom "alacritty --title scratchpad -e ranger")
+
     -- close focused window
     , ((modm, xK_q     ), kill)
 
@@ -113,7 +117,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm,               xK_t ), sendMessage NextLayout)
 
     --  Reset the layouts on the current workspace to default
-    , ((modm, xK_r ), setLayout $ XMonad.layoutHook conf)
+    -- , ((modm, xK_r ), setLayout $ XMonad.layoutHook conf)
 
     -- Resize viewed windows to the correct size
     , ((modm,               xK_n     ), refresh)
@@ -160,9 +164,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     --
     , ((modm              , xK_b     ), sendMessage ToggleStruts)
 
-    , ((modm .|. shiftMask, xK_t     ), toggleWindowSpacingEnabled >> sendMessage ToggleGaps)
+    , ((modm .|. shiftMask, xK_d     ), toggleWindowSpacingEnabled >> sendMessage ToggleGaps)
 
-    , ((modm , xK_f     ), doFullScreen)
+    , ((modm 			  , xK_f     ), doFullScreen)
 
     -- Quit xmonad
     , ((modm .|. shiftMask, xK_F2     ), io (exitWith ExitSuccess))
@@ -182,15 +186,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [((m .|. modm, k), windows $ f i)
         | (i, k) <- zip (XMonad.workspaces conf) ([xK_1 .. xK_9] ++ [xK_0])
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
-    ++
+    -- ++
 
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     --
-    [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-        | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
+    -- [((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+    --     | (key, sc) <- zip [xK_w, xK_e, xK_r] [0..]
+    --     , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]]
 
 
 ------------------------------------------------------------------------
@@ -226,6 +230,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 doFullScreen :: X ()
 doFullScreen = do
   sendMessage $ Toggle NBFULL
+  -- toggleBorders
   doCollapse
 
 doCollapse :: X ()
@@ -234,7 +239,21 @@ doCollapse = do
   toggleWindowSpacingEnabled
   sendMessage ToggleGaps
 
-myLayout =  renamed [Chain [CutWordsLeft 1, Append "</action>" , Prepend "<action=`notify-send \"beep\"` button=1>"]] . avoidStruts . spacingRaw False (Border 0 0 0 0) True (Border 8 8 8 8) True . gaps [(U, 22), (R, 22), (L, 22), (D, 22)]  $ renamed [Replace "<icon=layout-monadtall.xbm/>"] tiled ||| renamed [Replace "<icon=layout-monadwide.xbm/>"] ( Mirror tiled ) ||| renamed [Replace "<icon=layout-full.xbm/>"] Full
+
+toggleBorders = withFocused $ \w -> do
+  d <- asks display
+  bw <- asks $ borderWidth . config
+  wa <- io $ getWindowAttributes d w
+  let nbw = if wa_border_width wa == 0 then bw else 0
+  io $ setWindowBorderWidth d w nbw
+
+myLayout =  renamed [Chain [CutWordsLeft 1, Append "</action>" , Prepend "<action=`notify-send \"beep\"` button=1>"]]
+	. smartBorders
+	. avoidStruts
+	. spacingRaw False (Border 0 0 0 0) True (Border 8 8 8 8) True
+	. gaps [(U, 22), (R, 22), (L, 22), (D, 22)]
+	$ mkToggle (single NBFULL)
+	$ renamed [Replace "<icon=layout-monadtall.xbm/>"] tiled ||| renamed [Replace "<icon=layout-monadwide.xbm/>"] ( Mirror tiled ) ||| renamed [Replace "<icon=layout-full.xbm/>"] Full
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -266,6 +285,7 @@ myLayout =  renamed [Chain [CutWordsLeft 1, Append "</action>" , Prepend "<actio
 myManageHook = composeAll
     [ className =? "MPlayer"        --> doFloat
     , className =? "Gimp"           --> doFloat
+    , title =? "dropdown_ranger"     --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , className =? "discord"        --> doShift (myWorkspaces !! 9)
     , className =? "Spotify"        --> doShift (myWorkspaces !! 8)
@@ -322,7 +342,10 @@ main = do
       -- where
         -- toggleStrutsKey :: XConfig Layout -> (KeyMask, KeySym)
         -- toggleStrutsKey XConfig{ modMask } = (modMask, xK_b)
-    xmonad $ docks . ewmh $ def
+    xmonad
+	$ fullscreenSupport
+	$ docks . ewmh
+	$ def
         {        -- Run xmonad commands from command line with "xmonadctl command". Commands include:
         -- shrink, expand, next-layout, default-layout, restart-wm, xterm, kill, refresh, run,
         -- focus-up, focus-down, swap-up, swap-down, swap-master, sink, quit-wm. You can run
