@@ -80,7 +80,7 @@ audio() { \
 	}
 
 askrecording() { \
-	choice=$(printf "screencast\\nvideo\\naudio\\nwebcam\\nwebcam (hi-def)" | dmenu -i -p "Select recording style:")
+	choice=$(printf "screencast\\nvideo\\naudio\\nwebcam\\nwebcam (hi-def)" | rofi -dmenu -theme screenshot -location 5 -i -p "Recording style")
 	case "$choice" in
 		screencast) screencast;;
 		audio) audio;;

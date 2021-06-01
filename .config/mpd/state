@@ -1,9 +1,9 @@
-sw_volume: 100
+sw_volume: 90
 audio_device_state:1:pulse audio
 audio_device_state:1:toggle_visualizer
-state: pause
-current: 0
-time: 11.666000
+state: play
+current: 10
+time: 93.547000
 random: 0
 repeat: 0
 single: 0
@@ -12,35 +12,18 @@ crossfade: 0
 mixrampdb: 0.000000
 mixrampdelay: -1.000000
 playlist_begin
-0:Porter Robinson - Worlds (2014)/01 - Divinity (feat. Amy Millan).flac
-1:Porter Robinson - Worlds (2014)/02 - Sad Machine.flac
-2:Porter Robinson - Worlds (2014)/03 - Years Of War (feat. Breanne Duren & Sean Caskey).flac
-3:Porter Robinson - Worlds (2014)/04 - Flicker.flac
-4:Porter Robinson - Worlds (2014)/05 - Fresh Static Snow.flac
-5:Porter Robinson - Worlds (2014)/06 - Polygon Dust (feat. Lemaitre).flac
-6:Porter Robinson - Worlds (2014)/07 - Hear the Bells (feat. Imaginary Cities).flac
-7:Porter Robinson - Worlds (2014)/08 - Natural Light.flac
-8:Porter Robinson - Worlds (2014)/09 - Lionhearted (feat. Urban Cone).flac
-9:Porter Robinson - Worlds (2014)/10 - Sea of Voices.flac
-10:Porter Robinson - Worlds (2014)/11 - Fellow Feeling.flac
-11:Porter Robinson - Worlds (2014)/12 - Goodbye To a World.flac
-12:Angemi - Opus Interstellar.mp3
-13:porter robinson - shepherdess - s.h.e. (2016).wav
-14:Porter Robinson - Worlds (2014)/01 - Divinity (feat. Amy Millan).flac
-15:Porter Robinson - Worlds (2014)/02 - Sad Machine.flac
-16:Porter Robinson - Worlds (2014)/03 - Years Of War (feat. Breanne Duren & Sean Caskey).flac
-17:Porter Robinson - Worlds (2014)/04 - Flicker.flac
-18:Porter Robinson - Worlds (2014)/05 - Fresh Static Snow.flac
-19:Porter Robinson - Worlds (2014)/06 - Polygon Dust (feat. Lemaitre).flac
-20:Porter Robinson - Worlds (2014)/07 - Hear the Bells (feat. Imaginary Cities).flac
-21:Porter Robinson - Worlds (2014)/08 - Natural Light.flac
-22:Porter Robinson - Worlds (2014)/09 - Lionhearted (feat. Urban Cone).flac
-23:Porter Robinson - Worlds (2014)/10 - Sea of Voices.flac
-24:Porter Robinson - Worlds (2014)/11 - Fellow Feeling.flac
-25:Porter Robinson - Worlds (2014)/12 - Goodbye To a World.flac
-26:porter robinson - shepherdess - s.h.e. (2016).wav
-27:porter robinson - shepherdess.mp3
-28:OblivionFall/Welcome To The Cum Zone.flac
-29:OblivionFall/Heir To The Cum Throne.flac
-30:OblivionFall/Your Cum Wont Last.flac
+0:Porter Robinson/nurture/09-sweet-time.flac
+1:Porter Robinson/nurture/12-blossom.flac
+2:Porter Robinson/nurture/07-mother.flac
+3:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
+4:Porter Robinson/nurture/08-dullscythe.flac
+5:Porter Robinson/nurture/11-something-comforting.flac
+6:Porter Robinson/nurture/13-unfold.flac
+7:Porter Robinson/nurture/10-mirror.flac
+8:Porter Robinson/nurture/05-musician.flac
+9:Porter Robinson/nurture/14-trying-to-feel-alive.flac
+10:porter robinson - shepherdess - s.h.e. (2016).wav
+11:porter robinson - shepherdess.mp3
+12:OblivionFall/Welcome To The Cum Zone.flac
+13:OblivionFall/Heir To The Cum Throne.flac
 playlist_end

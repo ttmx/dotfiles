@@ -1,2 +1,2 @@
 #!/bin/sh
-dmenu -fn Monospace-18 -sb "#d79921" -sf "#1d2021" -nf "#000000" -nb "#000000" -p "$1" <&- && echo
+dmenu -fn monospace-13 -sb "#ff5370" -sf "#1b1e2b" -nf "#1b1e2b" -nb "#1b1e2b" -p "$1" <&- && echo

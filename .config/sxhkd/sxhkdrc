@@ -9,8 +9,8 @@ super + d
 # 	ddspawn $FILE
 super + e
 	$TERMINAL -e neomutt
-super + m
-	$TERMINAL -e ncmpcpp
+# super + m
+# 	$TERMINAL -e ncmpcpp
 super + n
 	$TERMINAL -e newsboat
 super + i
@@ -31,10 +31,12 @@ super + shift + g
 	gimp
 super + p
 	ddgui keepassxc
+super + c
+	clipupload
 
 # Et cetera...
 super + period
-	rofimoji --action copy
+	rofimoji --action copy -s neutral
 super + colon
 	dmenuunicode
 super + Scroll_Lock

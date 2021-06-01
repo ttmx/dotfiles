@@ -4,7 +4,7 @@
 # have this script run via vim.
 #
 # Compiles .tex. groff (.mom, .ms), .rmd, .md.  Opens .sent files as sent
-# presentations.  Runs scripts based on extention or shebang
+# presentations.  Runs scripts based on extension or shebang
 
 file=$(readlink -f "$1")
 dir=$(dirname "$file")

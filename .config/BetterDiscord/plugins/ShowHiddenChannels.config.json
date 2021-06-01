@@ -1,21 +1,27 @@
 {
-	"amounts": {
-		"hoverDelay": 0
-	},
 	"blacklist": [],
 	"categorydata": [],
-	"categorystatus": {
-		"86004744966914048": true,
-		"244230771232079873": true
+	"channels": {
+		"GUILD_TEXT": true,
+		"GUILD_VOICE": true,
+		"GUILD_ANNOUNCEMENT": true,
+		"GUILD_STORE": true,
+		"GUILD_STAGE_VOICE": true
+	},
+	"general": {
+		"sortNative": true,
+		"showVoiceUsers": true,
+		"alwaysCollapse": false,
+		"showForNormal": true
 	},
 	"settings": {
-		"alwaysCollapse": false,
-		"showAnnouncement": true,
-		"showForNormal": true,
-		"showStore": true,
+		"sortNative": true,
 		"showText": true,
 		"showVoice": true,
+		"showAnnouncement": true,
+		"showStore": true,
 		"showVoiceUsers": true,
-		"sortNative": false
+		"alwaysCollapse": false,
+		"showForNormal": true
 	}
 }

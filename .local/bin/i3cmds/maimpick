@@ -1,5 +1,6 @@
 #!/bin/sh
-case "$(printf " Full screen \\n Full screen\\n視 Window \\n視 Window\\n麗 Selected area" | rofi -dmenu -p "Screenshot" -theme screenshot -selected-row 1 -location 5 )" in
+case "$(printf " OCR\n Full screen \\n Full screen\\n視 Window \\n視 Window\\n麗 Selected area" | rofi -dmenu -p "Screenshot" -theme screenshot -selected -location 5 )" in
+	" OCR") ocr ;;
 	"麗 Selected area") maim -s $SCREENSHOTS/pic-selected-"$(date '+%y%m%d-%H%M-%S').png" ;;
 	"視 Window") maim -u -i "$(xdotool getactivewindow)" $SCREENSHOTS/pic-window-"$(date '+%y%m%d-%H%M-%S').png" ;;
 	" Full screen") sleep 0.1; maim $SCREENSHOTS/pic-full-"$(date '+%y%m%d-%H%M-%S').png" ;;
