@@ -68,11 +68,11 @@ set termguicolors
 	autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " vimling:
-	nm <leader>d :call ToggleDeadKeys()<CR>
-	imap <leader>d <esc>:call ToggleDeadKeys()<CR>a
-	nm <leader>i :call ToggleIPA()<CR>
-	imap <leader>i <esc>:call ToggleIPA()<CR>a
-	nm <leader>q :call ToggleProse()<CR>
+	" nm <leader>d :call ToggleDeadKeys()<CR>
+	" imap <leader>d <esc>:call ToggleDeadKeys()<CR>a
+	" nm <leader>i :call ToggleIPA()<CR>
+	" imap <leader>i <esc>:call ToggleIPA()<CR>a
+	" nm <leader>q :call ToggleProse()<CR>
 
 " Shortcutting split navigation, saving a keypress:
 	map <C-h> <C-w>h
@@ -101,6 +101,7 @@ set termguicolors
 	autocmd BufRead,BufNewFile /tmp/calcurse*,~/.calcurse/notes/* set filetype=markdown
 	autocmd BufRead,BufNewFile *.ms,*.me,*.mom,*.man set filetype=groff
 	autocmd BufRead,BufNewFile *.tex set filetype=tex
+	autocmd BufNewFile,BufRead *.rasi set filetype=css
 
 " Enable Goyo by default for mutt writting
 	" Goyo's width will be the line limit in mutt.
@@ -313,6 +314,8 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+" Rename var
+nmap <leader>rn  <Plug>(coc-rename)
 
 colorscheme palenight
 let g:airline_theme = "palenight"

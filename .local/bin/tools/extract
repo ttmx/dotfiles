@@ -33,6 +33,7 @@ if [ -f "$archive" ] ; then
 		*.Z) uncompress "$archive" ;;
 		*.7z) 7z x "$archive" ;;
 		*.xz) unxz "$archive" ;;
+		*.zst) zstd -d "$archive" ;;
 		*.exe) cabextract "$archive" ;;
 		*) printf "extract: '%s' - unknown archive method\\n" "$archive" ;;
 	esac

@@ -72,3 +72,14 @@ export LF_ICONS="di=:fi=:ln=:or=:ex=:*.c=:*.cc=:*.clj=:*
 test -r /home/tiago/.opam/opam-init/init.sh && . /home/tiago/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 # ndless-dev config
 # export PATH="$PATH:/home/tiago/Documents/src/Ndless/ndless-sdk/toolchain/install/bin:/home/tiago/Documents/src/Ndless/ndless-sdk/bin"
+
+
+export IDEA_JDK=/usr/lib/jvm/jre-jetbrains
+export PHPSTORM_JDK=/usr/lib/jvm/jre-jetbrains
+export WEBIDE_JDK=/usr/lib/jvm/jre-jetbrains
+export PYCHARM_JDK=/usr/lib/jvm/jre-jetbrains
+export RUBYMINE_JDK=/usr/lib/jvm/jre-jetbrains
+export CL_JDK=/usr/lib/jvm/jre-jetbrains
+export DATAGRIP_JDK=/usr/lib/jvm/jre-jetbrains
+export GOLAND_JDK=/usr/lib/jvm/jre-jetbrains
+export STUDIO_JDK=/usr/lib/jvm/jre-jetbrains

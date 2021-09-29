@@ -4,7 +4,7 @@ super + Return
 # super + shift + Return
 # 	samedir
 super + d
-	dmenu_run
+	rofi -show drun -show-icons
 # super + r
 # 	ddspawn $FILE
 super + e
@@ -17,8 +17,8 @@ super + i
 	$TERMINAL -e htop
 super + y
 	$TERMINAL -e calcurse
-super + shift + a
-	$TERMINAL -e pulsemixer; pkill -RTMIN+10 i3blocks
+# super + shift + a
+# 	$TERMINAL -e pulsemixer; pkill -RTMIN+10 i3blocks
 super + shift + c
 	camtoggle
 super + shift + m

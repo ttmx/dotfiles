@@ -8,6 +8,6 @@ bigpath=$(dirname $(pwd))
 
 case "$1" in
 	*.tex|*.md|*.rmd|*.ms|*.me|*.mom) setsid "$READER" "$basename".pdf >/dev/null 2>&1 & ;;
-	*.html) $TERMINAL reload -d $bigpath - & setsid "$BROWSER" --new-window "http://localhost:8080/$smallpath" >/dev/null 2>&1 & ;;
+	*.html) $TERMINAL -e reload -d $bigpath - & setsid "$BROWSER" --new-window "http://localhost:8080/$smallpath" >/dev/null 2>&1 & ;;
 	*.sent) setsid sent "$1" >/dev/null 2>&1 & ;;
 esac

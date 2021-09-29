@@ -12,6 +12,9 @@ case $BLOCK_BUTTON in
 esac
 
 wm=$(wmctrl -m |grep Name| awk '{print $2}')
+if [ "$wm" = "" ] && [ -n "$SWAYSOCK" ]; then
+	wm="i3"
+fi
 for battery in /sys/class/power_supply/BAT?
 do
 	capacity=$(cat "$battery"/capacity) || exit
