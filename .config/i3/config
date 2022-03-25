@@ -10,7 +10,7 @@
 #exec_always "xrdb ~/.Xdefaults"
 
 # #---Basic Definitions---# #
-for_window [class="^.*"] border pixel 3
+for_window [class="^.*"] border pixel 2
 hide_edge_borders smart
 focus_on_window_activation focus
 gaps inner 15
@@ -41,6 +41,7 @@ for_window [instance="keepassxc"] resize set 800 300
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id pkill picom;sleep 0.1; picom -b
 
+exec_always --no-startup-id i3-swallow
 #bar {
 #	font pango:Ubuntu, Font Awesome 5 Free 10
 #	status_command i3blocks
@@ -237,7 +238,7 @@ for_window [instance="blueman-manager"] floating enable
 
 for_window [title="Chat"] floating enable
 for_window [title="Chat"] resize set 330 500
-for_window [title="Chat"] move position 1590 528
+for_window [title="Chat"] move position 1568 528
 for_window [title="pulsemixer"] floating enable
 
 # #---Floating---# #

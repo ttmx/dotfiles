@@ -22,7 +22,7 @@ super + y
 super + shift + c
 	camtoggle
 super + shift + m
-	python ~/Uni/.scripts/openlink.py
+	python3 ~/Uni/.scripts/openlink.py
 super + shift + e
 	tutorialvids
 super + shift + w
@@ -126,4 +126,5 @@ super + F11
 super + F12
 	$TERMINAL -e sudo -A nmtui
 
-
+ctrl +{space ,space + shift,n,shift+period}
+	dunstctl {close,close-all,history-pop,context}

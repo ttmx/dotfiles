@@ -1,17 +1,23 @@
 [global]
     monitor = 0
     follow = keyboard
-    geometry = "350x5-0+24"
+    # geometry = "350x5-0+24"
+	width = (0,350)
+	# height = 5
+	# origin = top-right
+	# notification_limit = 
+	offset = 5x30
     indicate_hidden = yes
     shrink = yes
     transparency = 20
-    notification_height = 0
+    # notification_height = 0
     separator_height = 2
     padding = 0
     horizontal_padding = 8
     frame_width = 3
     frame_color = "#2e3440"
 	corner_radius = 2
+	scale = 1
 
     # Define a color for the separator.
     # possible values are:
@@ -62,16 +68,16 @@
 
     title = Dunst
     class = Dunst
-    startup_notification = false
+    # startup_notification = false
     force_xinerama = false
 [experimental]
     per_monitor_dpi = false
 
-[shortcuts]
-    close = ctrl+space
-    close_all = ctrl+shift+space
-    history = ctrl+n
-    context = ctrl+shift+period
+# [shortcuts]
+#     close = ctrl+space
+#     close_all = ctrl+shift+space
+#     history = ctrl+n
+#     context = ctrl+shift+period
 
 [urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
@@ -117,7 +123,7 @@
 
 [brave-ads]
 	appname = Brave
-	summary = {*Lenovo*,*Proton*,Crocs*,*BAT*,*Offer*}
+	# summary = {*Lenovo*,*Proton*,Crocs*,*BAT*,*Offer*}
 	format = ""
 
 #[espeak]

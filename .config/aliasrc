@@ -30,8 +30,13 @@ alias ka="killall" \
 	tb="nc termbin.com 9999"\
 	ls="exa"\
 	o="xdg-open"\
-	cproj="source $(which cproj)"
+	cproj=". $(which cproj)"\
+	lf="lfub"
+
+
 
 command -v nvim >/dev/null && alias vim="nvim" vimdiff="nvim -d" # Use neovim for vim if present.
+
+[ -f "$XINITRC" ] && alias startx="startx $XINITRC"
 
 vf() { fzf | xargs -r -I % $EDITOR % ;}

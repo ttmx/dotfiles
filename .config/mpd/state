@@ -1,8 +1,9 @@
-sw_volume: 80
+sw_volume: 84
 audio_device_state:1:pulse audio
 audio_device_state:1:toggle_visualizer
-state: stop
-current: 0
+state: pause
+current: 16
+time: 96.904000
 random: 0
 repeat: 0
 single: 0
@@ -11,126 +12,21 @@ crossfade: 0
 mixrampdb: 0.000000
 mixrampdelay: -1.000000
 playlist_begin
-0:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
-1:Porter Robinson/nurture/08-dullscythe.flac
-2:Porter Robinson/nurture/11-something-comforting.flac
-3:Porter Robinson/nurture/13-unfold.flac
-4:Porter Robinson/nurture/10-mirror.flac
-5:Porter Robinson/nurture/05-musician.flac
-6:Porter Robinson/nurture/14-trying-to-feel-alive.flac
-7:porter robinson - shepherdess.mp3
-8:OblivionFall/Welcome To The Cum Zone.flac
-9:OblivionFall/Heir To The Cum Throne.flac
-10:Porter Robinson/nurture/07-mother.flac
-11:Porter Robinson/Worlds/01 - Divinity (feat. Amy Millan).flac
-12:Porter Robinson/Worlds/02 - Sad Machine.flac
-13:Porter Robinson/Worlds/03 - Years Of War (feat. Breanne Duren & Sean Caskey).flac
-14:Porter Robinson/Worlds/04 - Flicker.flac
-15:Porter Robinson/Worlds/05 - Fresh Static Snow.flac
-16:Porter Robinson/Worlds/06 - Polygon Dust (feat. Lemaitre).flac
-17:Porter Robinson/Worlds/07 - Hear the Bells (feat. Imaginary Cities).flac
-18:Porter Robinson/Worlds/08 - Natural Light.flac
-19:Porter Robinson/Worlds/10 - Sea of Voices.flac
-20:Porter Robinson/Worlds/11 - Fellow Feeling.flac
-21:Porter Robinson/Worlds/12 - Goodbye To a World.flac
-22:porter robinson - shepherdess.mp3
-23:Porter Robinson/nurture/01-lifelike.flac
-24:Porter Robinson/nurture/02-look-at-the-sky.flac
-25:Porter Robinson/nurture/03-get-your-wish.flac
-26:Porter Robinson/nurture/04-wind-tempos.flac
-27:Porter Robinson/nurture/05-musician.flac
-28:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
-29:Porter Robinson/nurture/07-mother.flac
-30:Porter Robinson/nurture/08-dullscythe.flac
-31:Porter Robinson/nurture/10-mirror.flac
-32:Porter Robinson/nurture/11-something-comforting.flac
-33:Porter Robinson/nurture/13-unfold.flac
-34:Porter Robinson/nurture/14-trying-to-feel-alive.flac
-35:Porter Robinson/nurture/09-sweet-time.flac
-36:porter robinson - shepherdess.mp3
-37:porter robinson - shepherdess.mp3
-38:porter robinson - shepherdess - s.h.e. (2016).wav
-39:Porter Robinson/Worlds/01 - Divinity (feat. Amy Millan).flac
-40:Porter Robinson/Worlds/02 - Sad Machine.flac
-41:Porter Robinson/Worlds/03 - Years Of War (feat. Breanne Duren & Sean Caskey).flac
-42:Porter Robinson/Worlds/04 - Flicker.flac
-43:Porter Robinson/Worlds/05 - Fresh Static Snow.flac
-44:Porter Robinson/Worlds/06 - Polygon Dust (feat. Lemaitre).flac
-45:Porter Robinson/Worlds/07 - Hear the Bells (feat. Imaginary Cities).flac
-46:Porter Robinson/Worlds/08 - Natural Light.flac
-47:Porter Robinson/Worlds/10 - Sea of Voices.flac
-48:Porter Robinson/Worlds/11 - Fellow Feeling.flac
-49:Porter Robinson/Worlds/12 - Goodbye To a World.flac
-50:porter robinson - shepherdess - s.h.e. (2016).wav
-51:porter robinson - shepherdess.mp3
-52:Porter Robinson/nurture/01-lifelike.flac
-53:Porter Robinson/nurture/02-look-at-the-sky.flac
-54:Porter Robinson/nurture/03-get-your-wish.flac
-55:Porter Robinson/nurture/04-wind-tempos.flac
-56:Porter Robinson/nurture/05-musician.flac
-57:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
-58:Porter Robinson/nurture/07-mother.flac
-59:Porter Robinson/nurture/08-dullscythe.flac
-60:Porter Robinson/nurture/09-sweet-time.flac
-61:Porter Robinson/nurture/10-mirror.flac
-62:Porter Robinson/nurture/11-something-comforting.flac
-63:Porter Robinson/nurture/12-blossom.flac
-64:Porter Robinson/nurture/13-unfold.flac
-65:Porter Robinson/nurture/14-trying-to-feel-alive.flac
-66:Porter Robinson/nurture/01-lifelike.flac
-67:Porter Robinson/nurture/02-look-at-the-sky.flac
-68:Porter Robinson/nurture/03-get-your-wish.flac
-69:Porter Robinson/nurture/04-wind-tempos.flac
-70:Porter Robinson/nurture/05-musician.flac
-71:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
-72:Porter Robinson/nurture/07-mother.flac
-73:Porter Robinson/nurture/08-dullscythe.flac
-74:Porter Robinson/nurture/09-sweet-time.flac
-75:Porter Robinson/nurture/10-mirror.flac
-76:Porter Robinson/nurture/11-something-comforting.flac
-77:Porter Robinson/nurture/12-blossom.flac
-78:Porter Robinson/nurture/13-unfold.flac
-79:Porter Robinson/nurture/14-trying-to-feel-alive.flac
-80:Porter Robinson/nurture/01-lifelike.flac
-81:Porter Robinson/nurture/02-look-at-the-sky.flac
-82:Porter Robinson/nurture/03-get-your-wish.flac
-83:Porter Robinson/nurture/04-wind-tempos.flac
-84:Porter Robinson/nurture/05-musician.flac
-85:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
-86:Porter Robinson/nurture/07-mother.flac
-87:Porter Robinson/nurture/08-dullscythe.flac
-88:Porter Robinson/nurture/09-sweet-time.flac
-89:Porter Robinson/nurture/10-mirror.flac
-90:Porter Robinson/nurture/11-something-comforting.flac
-91:Porter Robinson/nurture/12-blossom.flac
-92:Porter Robinson/nurture/13-unfold.flac
-93:Porter Robinson/nurture/14-trying-to-feel-alive.flac
-94:Porter Robinson/Worlds/01 - Divinity (feat. Amy Millan).flac
-95:Porter Robinson/Worlds/02 - Sad Machine.flac
-96:Porter Robinson/Worlds/03 - Years Of War (feat. Breanne Duren & Sean Caskey).flac
-97:Porter Robinson/Worlds/04 - Flicker.flac
-98:Porter Robinson/Worlds/05 - Fresh Static Snow.flac
-99:Porter Robinson/Worlds/06 - Polygon Dust (feat. Lemaitre).flac
-100:Porter Robinson/Worlds/07 - Hear the Bells (feat. Imaginary Cities).flac
-101:Porter Robinson/Worlds/08 - Natural Light.flac
-102:Porter Robinson/Worlds/10 - Sea of Voices.flac
-103:Porter Robinson/Worlds/11 - Fellow Feeling.flac
-104:Porter Robinson/Worlds/12 - Goodbye To a World.flac
-105:Porter Robinson/nurture/01-lifelike.flac
-106:Porter Robinson/nurture/02-look-at-the-sky.flac
-107:Porter Robinson/nurture/03-get-your-wish.flac
-108:Porter Robinson/nurture/04-wind-tempos.flac
-109:Porter Robinson/nurture/05-musician.flac
-110:Porter Robinson/nurture/06-do-re-mi-fa-so-la-ti-do.flac
-111:Porter Robinson/nurture/07-mother.flac
-112:Porter Robinson/nurture/08-dullscythe.flac
-113:Porter Robinson/nurture/09-sweet-time.flac
-114:Porter Robinson/nurture/10-mirror.flac
-115:Porter Robinson/nurture/11-something-comforting.flac
-116:Porter Robinson/nurture/12-blossom.flac
-117:Porter Robinson/nurture/13-unfold.flac
-118:Porter Robinson/nurture/14-trying-to-feel-alive.flac
-119:porter robinson - shepherdess - s.h.e. (2016).wav
-120:porter robinson - shepherdess.mp3
-121:Monstercat Uncaged Vol. 5/34 - Muzzy & Sullivan King - In The Night (feat. Sullivan King).flac
+0:Voltage.wav
+1:OblivionFall/Welcome To The Cum Zone.flac
+2:OblivionFall/Heir To The Cum Throne.flac
+3:OblivionFall/Your Cum Wont Last.flac
+4:Monstercat Uncaged Vol. 5/01 - Pegboard Nerds & Knife Party - Harpoon.flac
+5:Porter Robinson/nurture/01-lifelike.flac
+6:Porter Robinson/nurture/07-mother.flac
+7:Porter Robinson/nurture/09-sweet-time.flac
+8:Porter Robinson/nurture/14-trying-to-feel-alive.flac
+9:Porter Robinson/nurture/12-blossom.flac
+10:Skrillex/2013 - Greatest Hits & Remixes/CD2/(07) [Lady Gaga] Bad Romance (Skrillex Remix).flac
+11:Skrillex/2013 - Greatest Hits & Remixes/CD2/(10) [Lady Gaga] Alejandro (Skrillex Mix).flac
+12:Skrillex/2011 - More Monsters And Sprites/Skrillex - More Monsters And Sprites - 2011.cue/track0003
+13:Skrillex/2014 - Recess/03. Stranger.flac
+14:Skrillex/2014 - Recess/05. Coast Is Clear ft. Chance The Rapper.flac
+15:Skrillex/2014 - Recess/02. Recess ft. Kill The Noise & Fatman Scoop.flac
+16:Skrillex/2013 - Greatest Hits & Remixes/CD2/(09) [La Roux] In For The Kill (Skrillex Remix).flac
 playlist_end

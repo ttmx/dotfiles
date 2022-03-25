@@ -29,7 +29,7 @@ case "$file" in
 	*\.[0-9]) refer -PS -e "$file" | groff -mandoc -T pdf > "$base".pdf ;;
 	*\.rmd) echo "require(rmarkdown); render('$file')" | R -q --vanilla ;;
 	*\.tex) textype "$file" ;;
-	*\.md) pandoc "$file" --pdf-engine=xelatex -o "$base".pdf ;;
+	*\.md) md2pdf "$file" -o "$base".pdf ;;
 	*config.h) sudo make install ;;
 	*config.def.h) sudo make install ;;
     *\.c) cc "$file" -lm -o "$base" && "$base" ;;
@@ -41,5 +41,6 @@ case "$file" in
 	*\.java) javac "$file"&& java "$basename" ;;
 	*\.ml) ocamlopt "$base.mli" "$file" -o "$base" && rm "$base.cmx" "$base.o" && "$base" ;;
 	*\.lp) clingo "$base.lp" 0;;
+	*\.rs) cargo run;;
 	*) sed 1q "$file" | grep "^#!/" | sed "s/^#!//" | xargs -r -I % "$file" ;;
 esac

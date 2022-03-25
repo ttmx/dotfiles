@@ -10,6 +10,7 @@ if ! filereadable(expand('~/.config/nvim/autoload/plug.vim'))
 endif
 set tabstop=4
 set shiftwidth=4
+set noshowmode
 call plug#begin('~/.config/nvim/plugged')
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdtree'
@@ -26,7 +27,7 @@ Plug 'kovetskiy/sxhkd-vim'
 " Plug 'arcticicestudio/nord-vim'
 Plug 'drewtempelmeyer/palenight.vim'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'jackguo380/vim-lsp-cxx-highlight'
+" Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'prettier/vim-prettier', {
   \ 'do': 'yarn install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
@@ -109,7 +110,7 @@ set termguicolors
 	autocmd BufRead,BufNewFile /tmp/neomutt* :Goyo \| set bg=dark
 
 " Automatically deletes all trailing whitespace on save.
-	autocmd BufWritePre * %s/\s\+$//e
+	" autocmd BufWritePre * %s/\s\+$//e
 
 " When shortcut files are updated, renew bash and vifm configs with new material:
 	autocmd BufWritePost ~/.config/bmdirs,~/.config/bmfiles !shortcuts
@@ -118,7 +119,7 @@ set termguicolors
 	autocmd BufWritePost *sxhkdrc !pkill -USR1 sxhkd
 
 " Run xrdb whenever Xdefaults or Xresources are updated.
-	autocmd BufWritePost *Xresources,*Xdefaults !xrdb %
+	autocmd BufWritePost *Xresources,*Xdefaults,xresources !xrdb %
 " Restart picom whenever compton conf is updated
 	autocmd BufWritePost *picom.conf !pkill picom; picom -b
 
