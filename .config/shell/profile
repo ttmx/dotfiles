@@ -19,9 +19,9 @@ export GTK2_RC_FILES="$HOME/.config/gtk-2.0/gtkrc-2.0"
 export SXHKD_SHELL="/bin/sh"
 
 #ffsend
-export FFSEND_HOST="https://send.tteles.dev/"
+# export FFSEND_HOST="https://send.tteles.dev/"
 # seriously, feel free to use it, I just don't want to get crawled into a pedo hub
-export FFSEND_BASIC_AUTH="insecure:feelfreetouse"
+# export FFSEND_BASIC_AUTH="insecure:feelfreetouse"
 
 
 # Cleanup of home dir

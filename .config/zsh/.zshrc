@@ -21,9 +21,11 @@ HISTFILE=~/.cache/zsh/history
 
 # Basic auto/tab complete:
 autoload -U compinit
-zstyle ':completion:*' menu select
 zmodload zsh/complist
+setopt menucomplete
+zstyle ':completion:*' menu select
 compinit
+compdef _gnu_generic
 _comp_options+=(globdots)		# Include hidden files.
 
 # vi mode

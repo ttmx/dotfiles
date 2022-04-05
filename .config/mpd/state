@@ -2,8 +2,8 @@ sw_volume: 84
 audio_device_state:1:pulse audio
 audio_device_state:1:toggle_visualizer
 state: pause
-current: 16
-time: 96.904000
+current: 17
+time: 77.845000
 random: 0
 repeat: 0
 single: 0
@@ -29,4 +29,5 @@ playlist_begin
 14:Skrillex/2014 - Recess/05. Coast Is Clear ft. Chance The Rapper.flac
 15:Skrillex/2014 - Recess/02. Recess ft. Kill The Noise & Fatman Scoop.flac
 16:Skrillex/2013 - Greatest Hits & Remixes/CD2/(09) [La Roux] In For The Kill (Skrillex Remix).flac
+17:Porter Robinson/porter robinson - shepherdess - s.h.e. (2016).wav
 playlist_end

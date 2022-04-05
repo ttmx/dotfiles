@@ -50,6 +50,19 @@ cmd open ${{
 
 cmd mkdir $mkdir -p "$(echo $* | tr ' ' '\ ')"
 
+
+cmd paste &{{
+    set -- $(cat ~/.local/share/lf/files)
+    mode="$1"
+    shift
+    case "$mode" in
+        copy) cp -rn -- "$@" .;;
+        move) mv -n -- "$@" .;;
+    esac
+    rm ~/.local/share/lf/files
+    lf -remote "send clear"
+}}
+
 cmd extract ${{
 	clear; tput cup $(($(tput lines)/3)); tput bold
 	set -f
@@ -96,36 +109,40 @@ cmd bulkrename $vidir
 # Bindings
 map <c-f> $lf -remote "send $id select '$(fzf)'"
 map J $lf -remote "send $id cd $(sed -e 's/\s*#.*//' -e '/^$/d' -e 's/^\S*\s*//' ${XDG_CONFIG_HOME:-$HOME/.config}/bmdirs | fzf)"
-map gh
-map g top
-map D delete
-map E extract
-map C copyto
-map M moveto
+map gg top
+map e extract
 map <c-n> push :mkdir<space>
 map <c-r> reload
-map <c-s> set hidden!
+map <c-c> clear
+map <backspace2> set hidden!
+map <backspace> set hidden!
 map <enter> shell
 map x $$f
 map X !$f
-map o &mimeopen $f
-map O $mimeopen --ask $f
+map o $mimeopen --ask $f
+map D &dragon-drop -x $fx
+map U $file $fx |grep -e "Unicode\|ASCII\|UTF-8\|text" -o && cat $fx | nc termbin.com 9999 |tr -d '\n\0'| xclip -selection clipboard || ffsend upload $fx --copy
+
+map d
+map dd cut
+map dD delete
+
+map y
+map yy copy
+map yl &onedrivedl $f
+map yp &printf "%s" "$fx" | xclip -selection clipboard
 
 map A rename # at the very end
-map c push A<c-u> # new rename
-map I push A<c-a> # at the very beginning
-map i push A<a-b><a-b><a-f> # before extention
-map a push A<a-b> # after extention
+map c push A<a-b><a-b><a-f><c-u> # new rename
+map i push A<c-a> # at the very beginning
+map a push A<a-b><a-b><a-f> # before extention
 map B bulkrename
 map b $setbg $f
 
-map <c-e> down
-map <c-y> up
-map V push :!nvim<space>
+map V push :$nvim<space>
+map S $setsid -f $TERMINAL >/dev/null 2>&1
 
-map W $setsid -f $TERMINAL >/dev/null 2>&1
-
-map Y $printf "%s" "$fx" | xclip -selection clipboard
+%[ $LF_LEVEL -eq 1 ] || echo "Warning: You're in a nested lf instance!"
 
 # Source Bookmarks
 source "~/.config/lf/shortcutrc"

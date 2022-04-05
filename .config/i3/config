@@ -10,11 +10,13 @@
 #exec_always "xrdb ~/.Xdefaults"
 
 # #---Basic Definitions---# #
-for_window [class="^.*"] border pixel 2
+for_window [class="^.*"] border pixel 0
+# for_window [class="^.*"] border pixel 2
+# border_radius 10
 hide_edge_borders smart
 focus_on_window_activation focus
-gaps inner 15
-gaps outer 15
+gaps inner 24
+gaps outer 5
 set $term --no-startup-id $TERMINAL
 set $mod Mod4
 font pango:Ubuntu
@@ -27,8 +29,8 @@ for_window [instance="dropdown_*"] sticky enable
 for_window [instance="dropdown_*"] scratchpad show
 for_window [instance="dropdown_tmuxdd"] resize set 625 450
 for_window [instance="dropdown_dropdowncalc"] resize set 800 300
-for_window [instance="dropdown_tmuxdd"] border pixel 3
-for_window [instance="dropdown_dropdowncalc"] border pixel 2
+# for_window [instance="dropdown_tmuxdd"] border pixel 3
+# for_window [instance="dropdown_dropdowncalc"] border pixel 2
 for_window [instance="dropdown_*"] move position center
 for_window [instance="keepassxc"] scratchpad show
 for_window [instance="keepassxc"] floating enable
@@ -42,6 +44,7 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id pkill picom;sleep 0.1; picom -b
 
 exec_always --no-startup-id i3-swallow
+exec_always --no-startup-id autotiling-rs
 #bar {
 #	font pango:Ubuntu, Font Awesome 5 Free 10
 #	status_command i3blocks
@@ -236,9 +239,9 @@ assign [instance="spotify"] workspace $ws9
 
 for_window [instance="blueman-manager"] floating enable
 
-for_window [title="Chat"] floating enable
-for_window [title="Chat"] resize set 330 500
-for_window [title="Chat"] move position 1568 528
+for_window [instance="Chat"] floating enable
+for_window [instance="Chat"] resize set 330 500
+for_window [instance="Chat"] move position 1568 528
 for_window [title="pulsemixer"] floating enable
 
 # #---Floating---# #

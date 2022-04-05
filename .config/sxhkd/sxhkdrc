@@ -32,7 +32,7 @@ super + shift + g
 super + p
 	ddgui keepassxc
 super + c
-	clipupload
+	cabl
 
 # Et cetera...
 super + period
