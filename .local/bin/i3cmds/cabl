@@ -12,7 +12,7 @@ prim="$(xclip -o -selection clipboard -target "$target")"; [ -z "$prim" ] && exi
 # [ -f "$prim" ] && xdg-open "$prim" && exit
 # [ -d "$prim" ] && "$TERMINAL" "$prim" && exit
 
-[ -z "$istxt" ] || translate() { "notify-send" "$(trans -b "$@")" ;}
+[ -z "$istxt" ] || translate() { "notify-send" "Translation" "$(trans -b "$@")" ;}
 upload() { "clipupload" ;}
 # websearch() { "$BROWSER" "https://duckduckgo.com/?q=$@" ;}
 # wikipedia() { "$BROWSER" "https://en.wikipedia.org/wiki/$@" ;}

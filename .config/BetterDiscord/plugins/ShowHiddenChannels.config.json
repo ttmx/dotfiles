@@ -1,29 +1,31 @@
 {
-	"blacklist": [],
-	"categorydata": [],
-	"channels": {
-		"GUILD_TEXT": true,
-		"GUILD_VOICE": true,
-		"GUILD_ANNOUNCEMENT": true,
-		"GUILD_STORE": true,
-		"GUILD_STAGE_VOICE": true
-	},
-	"general": {
-		"alwaysCollapse": false,
-		"showVoiceUsers": true,
-		"showForNormal": true
-	},
-	"settings": {
-		"sortNative": true,
-		"showText": true,
-		"showVoice": true,
-		"showAnnouncement": true,
-		"showStore": true,
-		"showVoiceUsers": true,
-		"alwaysCollapse": false,
-		"showForNormal": true
-	},
-	"sortOrder": {
-		"hidden": "native"
+	"all": {
+		"blacklist": [],
+		"categorydata": [],
+		"channels": {
+			"GUILD_TEXT": true,
+			"GUILD_VOICE": true,
+			"GUILD_ANNOUNCEMENT": true,
+			"GUILD_STORE": true,
+			"GUILD_STAGE_VOICE": true
+		},
+		"general": {
+			"alwaysCollapse": false,
+			"showVoiceUsers": true,
+			"showForNormal": true
+		},
+		"settings": {
+			"sortNative": true,
+			"showText": true,
+			"showVoice": true,
+			"showAnnouncement": true,
+			"showStore": true,
+			"showVoiceUsers": true,
+			"alwaysCollapse": false,
+			"showForNormal": true
+		},
+		"sortOrder": {
+			"hidden": "native"
+		}
 	}
 }

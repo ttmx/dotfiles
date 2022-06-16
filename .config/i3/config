@@ -27,7 +27,7 @@ for_window [instance="dropdown_*"] floating enable
 for_window [instance="dropdown_*"] move scratchpad
 for_window [instance="dropdown_*"] sticky enable
 for_window [instance="dropdown_*"] scratchpad show
-for_window [instance="dropdown_tmuxdd"] resize set 625 450
+for_window [instance="dropdown_tmuxdd"] resize set 800 520
 for_window [instance="dropdown_dropdowncalc"] resize set 800 300
 # for_window [instance="dropdown_tmuxdd"] border pixel 3
 # for_window [instance="dropdown_dropdowncalc"] border pixel 2
@@ -86,7 +86,7 @@ bindsym $mod+shift+q		[con_id="__focused__" instance="^(?!dropdown_).*$"] exec -
 bindsym $mod+shift+r		exec --no-startup-id winresize
 
 bindsym $mod+t			split toggle
-bindsym $mod+shift+t		gaps inner current set 15; gaps outer current set 15
+bindsym $mod+shift+t		gaps inner current set 24; gaps outer current set 5
 
 bindsym $mod+shift+y		exec --no-startup-id i3resize left
 
@@ -105,7 +105,7 @@ bindsym $mod+m			exec --no-startup-id ddspawn ncmpcpp
 bindsym $mod+s			gaps inner current plus 5
 bindsym $mod+shift+s		gaps inner current minus 5
 
-bindsym $mod+shift+d		gaps inner current set 0; gaps outer current set 0
+bindsym $mod+shift+d		gaps inner current set 4; gaps outer current set 0
 
 set $freeze distraction-free mode (super+shift+f to reactivate bindings)
 mode "$freeze" { bindsym $mod+Shift+f mode "default"

@@ -1,9 +1,8 @@
-sw_volume: 84
+sw_volume: 60
 audio_device_state:1:pulse audio
 audio_device_state:1:toggle_visualizer
-state: pause
-current: 17
-time: 77.845000
+state: stop
+current: 0
 random: 0
 repeat: 0
 single: 0
@@ -30,4 +29,39 @@ playlist_begin
 15:Skrillex/2014 - Recess/02. Recess ft. Kill The Noise & Fatman Scoop.flac
 16:Skrillex/2013 - Greatest Hits & Remixes/CD2/(09) [La Roux] In For The Kill (Skrillex Remix).flac
 17:Porter Robinson/porter robinson - shepherdess - s.h.e. (2016).wav
+18:Skrillex/2013 - Greatest Hits & Remixes/CD2/(05) [Avicii] Levels (Skrillex Remix).flac
+19:Skrillex - Bug Hunt Clean edit.mp3
+20:Skrillex/2013 - Greatest Hits & Remixes/CD2/(15) [Bring Me The Horizon] The Sadness Will Never End (Skrillex Remix).flac
+21:Angemi - Opus Interstellar.mp3
+22:Skrillex/2013 - Greatest Hits & Remixes/CD2/(06) [Foreign Beggars & Skrillex] Still Getting It.flac
+23:Skrillex/2013 - Greatest Hits & Remixes/CD2/(09) [La Roux] In For The Kill (Skrillex Remix).flac
+24:Two Steps From Hell/Professor Pumplestickle.flac
+25:Skrillex/2013 - Leaving/1. Skrillex  - The Reason.flac
+26:Skrillex/2014 - Recess/01. All Is Fair In Love And Brostep ft. The Ragga Twins.flac
+27:Skrillex/2014 - Recess/02. Recess ft. Kill The Noise & Fatman Scoop.flac
+28:Skrillex/2014 - Recess/03. Stranger.flac
+29:Skrillex/2014 - Recess/04. Try It Out (Neon Mix) ft. Alvin Risk.flac
+30:Skrillex/2014 - Recess/05. Coast Is Clear ft. Chance The Rapper.flac
+31:Skrillex/2014 - Recess/06. Dirty Vibe ft. Diplo.flac
+32:Skrillex/2014 - Recess/07. Ragga Bomb ft. The Ragga Twins.flac
+33:Skrillex/2014 - Recess/08. Doompy Poomp ft. Mishka.flac
+34:Skrillex/2014 - Recess/09. FucK That.flac
+35:Skrillex/2014 - Recess/10. Ease My Mind.flac
+36:Skrillex/2014 - Recess/11. Fire Away.flac
+37:Skrillex/2014 - Recess/01. All Is Fair In Love And Brostep ft. The Ragga Twins.flac
+38:Skrillex/2014 - Recess/02. Recess ft. Kill The Noise & Fatman Scoop.flac
+39:Skrillex/2014 - Recess/03. Stranger.flac
+40:Skrillex/2014 - Recess/04. Try It Out (Neon Mix) ft. Alvin Risk.flac
+41:Skrillex/2014 - Recess/05. Coast Is Clear ft. Chance The Rapper.flac
+42:Skrillex/2014 - Recess/06. Dirty Vibe ft. Diplo.flac
+43:Skrillex/2014 - Recess/07. Ragga Bomb ft. The Ragga Twins.flac
+44:Skrillex/2014 - Recess/08. Doompy Poomp ft. Mishka.flac
+45:Skrillex/2014 - Recess/09. FucK That.flac
+46:Skrillex/2014 - Recess/10. Ease My Mind.flac
+47:Skrillex/2014 - Recess/11. Fire Away.flac
+48:Skrillex/2010 - Scary Monsters And Nice Sprites/03. Kill Everybody.flac
+49:Skrillex/2010 - Scary Monsters And Nice Sprites/01. Rock N' Roll (Will Take You To The Mountain).flac
+50:Skrillex/2010 - Scary Monsters And Nice Sprites/04. All I Ask Of You.flac
+51:Skrillex/2012 - Make It Bun Dem After Hours [with Damian ''Jr. Gong'' Marley]/01-Make It Bun Dem (Original).flac
+52:Skrillex/2011 - Bangarang/04 The Devil's Den.flac
 playlist_end

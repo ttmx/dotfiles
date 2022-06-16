@@ -121,7 +121,8 @@ map x $$f
 map X !$f
 map o $mimeopen --ask $f
 map D &dragon-drop -x $fx
-map U $file $fx |grep -e "Unicode\|ASCII\|UTF-8\|text" -o && cat $fx | nc termbin.com 9999 |tr -d '\n\0'| xclip -selection clipboard || ffsend upload $fx --copy
+map U $file $fx |grep -e "Unicode\|ASCII\|UTF-8\|text" -o && cat $fx | nc termbin.com 9999 |tr -d '\n\0'| xclip -selection clipboard || ffsend upload -d 5 $fx --copy
+map C $zip zip.zip $fx
 
 map d
 map dd cut

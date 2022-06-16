@@ -41,6 +41,7 @@ x-scheme-handler/tg=userapp-Telegram Desktop-NQSAX0.desktop
 x-scheme-handler/msteams=teams.desktop
 x-scheme-handler/mailspring=Mailspring.desktop
 inode/directory=file.desktop
+x-scheme-handler/xmpp=brave-browser.desktop
 
 [Added Associations]
 application/pdf=org.pwmt.zathura-pdf-mupdf.desktop;

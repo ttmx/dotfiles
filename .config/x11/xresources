@@ -32,5 +32,4 @@
 #define palenight0E #c792ea
 #define palenight0F #ff5370
 
-
-/* Xft.dpi: 160 */
+#include ".config/x11/themes/palenight-alt/xresources"

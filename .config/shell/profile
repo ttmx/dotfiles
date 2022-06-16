@@ -3,6 +3,8 @@
 
 # Adds `~/.local/bin/` and all subdirectories to $PATH
 export PATH="$(du "$HOME/.local/bin/" | cut -f2 | tr '\n' ':' | sed 's/:*$//'):$PATH"
+# Contiki
+# export PATH=/opt/ti/mspgcc/bin:$PATH
 # If Ndless wanted
 # export PATH="$(du "$HOME/.local/bin/" | cut -f2 | tr '\n' ':' | sed 's/:*$//'):$PATH:/home/tiago/Documents/src/Ndless/ndless-sdk/toolchain/install/bin:/home/tiago/Documents/src/Ndless/ndless-sdk/bin"
 
@@ -82,6 +84,8 @@ export DATAGRIP_JDK=/usr/lib/jvm/jre-jetbrains
 export GOLAND_JDK=/usr/lib/jvm/jre-jetbrains
 export STUDIO_JDK=/usr/lib/jvm/jre-jetbrains
 
+
+wal -R
 
 # Start graphical server if i3 not already running.
 [ "$(tty)" = "/dev/tty1" ] && ! pidof -s Xorg >/dev/null 2>&1 && exec startx "$XINITRC"

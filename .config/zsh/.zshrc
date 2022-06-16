@@ -78,5 +78,5 @@ autoload edit-command-line; zle -N edit-command-line
 # Load aliases and shortcuts if existent.
 [ -f "$HOME/.config/shortcutrc" ] && source "$HOME/.config/shortcutrc"
 [ -f "$HOME/.config/aliasrc" ] && source "$HOME/.config/aliasrc"
-
+(cat ~/.cache/wal/sequences &)
 [ -f "/usr/share/zsh/plugins/zsh-fish.zsh" ] && source "/usr/share/zsh/plugins/zsh-fish.zsh"
